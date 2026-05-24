@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand Leonardo Industries - design system condiviso */
+    --bg-page: 222 47% 5%;       /* #020617 */
+    --bg-base: 222 47% 11%;      /* #0f172a */
+    --bg-sidebar: 222 47% 8%;    /* #0b1220 */
+    --bg-card: 215 28% 17%;      /* #1e293b */
+    --bg-card-2: 215 19% 27%;    /* #334155 */
+    --border-leo: 215 19% 27%;   /* #334155 */
+    --border-light: 215 16% 35%; /* #475569 */
+    --text-primary: 210 40% 95%; /* #f1f5f9 */
+    --text-secondary: 213 27% 84%;/* #cbd5e1 */
+    --text-muted: 215 20% 65%;   /* #94a3b8 */
+    --text-disabled: 215 16% 47%;/* #64748b */
+
+    /* Brand accents */
+    --brand-blue: 226 71% 48%;
+    --brand-blue-dark: 224 76% 32%;
+    --brand-cyan: 189 94% 43%;
+    --brand-green: 160 84% 39%;
+
+    /* shadcn mapping */
+    --background: var(--bg-page);
+    --foreground: var(--text-primary);
+    --card: var(--bg-card);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-card);
+    --popover-foreground: var(--text-primary);
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--bg-card-2);
+    --secondary-foreground: var(--text-primary);
+    --muted: var(--bg-card);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--bg-card-2);
+    --accent-foreground: var(--text-primary);
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: var(--border-leo);
+    --input: var(--border-leo);
+    --ring: 217 91% 60%;
+    --radius: 0.625rem;
+  }
+
+  html { color-scheme: dark; }
+  * { @apply border-border; }
+  body {
+    @apply text-foreground antialiased;
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(29,78,216,0.12), transparent 60%),
+      radial-gradient(900px 500px at 90% 110%, rgba(16,185,129,0.08), transparent 60%),
+      linear-gradient(135deg, hsl(var(--bg-page)) 0%, hsl(var(--bg-base)) 50%, hsl(var(--bg-page)) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .brand-gradient {
+    background: linear-gradient(135deg, #1d4ed8 0%, #0891b2 50%, #10b981 100%);
+  }
+  .brand-gradient-text {
+    background: linear-gradient(90deg, #2563eb 0%, #06b6d4 50%, #10b981 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .leo-card {
+    @apply rounded-xl border border-border bg-card/60 backdrop-blur-sm shadow-lg;
+  }
+}
