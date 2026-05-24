@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertOctagon, Lock, AlertTriangle, X } from "lucide-react";
+import { AlertOctagon, Lock, AlertTriangle, X, ShieldAlert } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 
 export interface QualityPopupItem {
   id: string;
-  kind: "block" | "request_overdue" | "nc_critical";
+  kind: "block" | "request_overdue" | "nc_critical" | "loss_prevention";
   severity: string;
   title: string;
   description: string | null;
@@ -23,6 +23,7 @@ export interface QualityPopupItem {
   company_name: string | null;
   project_code: string | null;
   opened_at: string;
+  estimated_loss_euro?: number | null;
 }
 
 const SESSION_KEY = "qsentinel:popups_dismissed";
@@ -48,6 +49,7 @@ const KIND_META = {
   block: { Icon: Lock, color: "text-status-red", border: "border-status-red", label: "BLOCCO OPERATIVO" },
   nc_critical: { Icon: AlertOctagon, color: "text-status-red", border: "border-status-red", label: "NC CRITICA APERTA" },
   request_overdue: { Icon: AlertTriangle, color: "text-status-orange", border: "border-status-orange", label: "RICHIESTA SCADUTA" },
+  loss_prevention: { Icon: ShieldAlert, color: "text-status-red", border: "border-status-red", label: "RISCHIO ECONOMICO" },
 } as const;
 
 export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
@@ -78,7 +80,7 @@ export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
 
   return (
     <Dialog open={!!current} onOpenChange={(o) => !o && dismissCurrent()}>
-      <DialogContent className={`max-w-md border-2 ${meta.border} bg-leo-card`}>
+      <DialogContent className={`max-w-md border-2 ${meta.border} bg-leo-card ${current.kind === "loss_prevention" || current.kind === "block" ? "alert-critical-pulse" : ""}`}>
         <DialogHeader>
           <div className="flex items-center gap-2">
             <Icon className={`h-6 w-6 ${meta.color}`} />
@@ -98,6 +100,11 @@ export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
             {current.project_code && <span> · {current.project_code}</span>}
             <span> · da {new Date(current.opened_at).toLocaleDateString("it-IT")}</span>
           </div>
+          {current.estimated_loss_euro != null && (
+            <div className="mt-2 rounded-md border border-status-red/40 bg-status-red/10 px-3 py-2 text-sm font-medium text-status-red">
+              Rischio economico stimato: {Number(current.estimated_loss_euro).toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
+            </div>
+          )}
         </DialogHeader>
         <DialogFooter className="flex-row justify-end gap-2 sm:gap-2">
           <Button variant="ghost" size="sm" onClick={dismissCurrent}>

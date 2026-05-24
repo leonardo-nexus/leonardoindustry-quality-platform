@@ -109,6 +109,8 @@ export default async function QualitySentinelPage() {
         actions={
           <div className="flex gap-2">
             <Button asChild variant="outline"><Link href="/notifications">Notifiche</Link></Button>
+            <Button asChild variant="outline" className="border-status-red/40 text-status-red hover:bg-status-red/10"><Link href="/quality-sentinel/risk">⚠ Rischio economico</Link></Button>
+            <Button asChild variant="outline"><Link href="/quality-sentinel/reports">Report criticità</Link></Button>
             <Button asChild><Link href="/quality-sentinel/executive">Vista direzione</Link></Button>
           </div>
         }

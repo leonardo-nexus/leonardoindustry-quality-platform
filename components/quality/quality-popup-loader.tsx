@@ -11,7 +11,7 @@ export async function QualityPopupLoader() {
   const companyId = session.person.company_id;
   const today = new Date().toISOString().slice(0, 10);
 
-  const [{ data: blocks }, { data: ncCrit }, { data: reqOver }] = await Promise.all([
+  const [{ data: blocks }, { data: ncCrit }, { data: reqOver }, { data: lossBlockers }] = await Promise.all([
     supabase
       .from("quality_block")
       .select("id, type, severity, description, opened_at, action_required, project:project_id(code, name), company:company_id(name)")
@@ -35,6 +35,14 @@ export async function QualityPopupLoader() {
       .lt("due_date", today)
       .in("status", ["inviata", "sollecitata"])
       .order("due_date")
+      .limit(5),
+    supabase
+      .from("loss_event")
+      .select("id, category, severity, title, description, estimated_loss_euro, created_at, project:project_id(code), company:company_id(name)")
+      .eq("company_id", companyId)
+      .in("severity", ["critico", "blocco"])
+      .eq("status", "aperto")
+      .order("created_at", { ascending: false })
       .limit(5),
   ]);
 
@@ -77,6 +85,20 @@ export async function QualityPopupLoader() {
       company_name: (r as any).company?.name ?? null,
       project_code: null,
       opened_at: r.due_date,
+    });
+  }
+  for (const le of lossBlockers ?? []) {
+    items.push({
+      id: le.id,
+      kind: "loss_prevention",
+      severity: le.severity,
+      title: le.title,
+      description: le.description ?? null,
+      action_url: "/quality-sentinel/risk",
+      company_name: (le as any).company?.name ?? null,
+      project_code: (le as any).project?.code ?? null,
+      opened_at: le.created_at,
+      estimated_loss_euro: le.estimated_loss_euro ? Number(le.estimated_loss_euro) : null,
     });
   }
 

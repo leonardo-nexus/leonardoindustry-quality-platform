@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 import { ChecklistItemControl, CompleteButton, SignButton } from "./controls";
 
 export default async function ChecklistDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -120,6 +121,8 @@ export default async function ChecklistDetail({ params }: { params: Promise<{ id
               )}
             </CardContent>
           </Card>
+
+          <AuditTrailPanel entityType="quality_checklist" entityId={id} showRevisions />
         </div>
       </div>
     </>

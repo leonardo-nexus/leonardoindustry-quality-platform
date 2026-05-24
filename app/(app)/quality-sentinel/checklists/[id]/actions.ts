@@ -3,12 +3,21 @@ import { revalidatePath } from "next/cache";
 import { createHash } from "node:crypto";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { requireSession } from "@/lib/auth/session";
+import { writeAuditLog, logUpdate } from "@/lib/audit/audit-log";
 
 export async function setItemResultAction(itemId: string, result: string, notes?: string) {
   const session = await requireSession();
   if (!session.person) return { error: "Profilo persona mancante" };
 
   const supabase = await createServerClient();
+
+  // Snapshot precedente per audit
+  const { data: prev } = await supabase
+    .from("quality_checklist_item")
+    .select("*")
+    .eq("id", itemId)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("quality_checklist_item")
     .update({
@@ -19,6 +28,13 @@ export async function setItemResultAction(itemId: string, result: string, notes?
     })
     .eq("id", itemId);
   if (error) return { error: error.message };
+
+  // Audit log dell'esito
+  if (prev) {
+    await logUpdate("quality_checklist_item", itemId, prev, {
+      ...prev, result, notes: notes || null, compiled_by: session.person.id,
+    }, { reason_type: "compilazione" });
+  }
 
   // Auto-aggiorna stato checklist a "in_corso" se era non_avviata
   const { data: item } = await supabase.from("quality_checklist_item").select("checklist_id").eq("id", itemId).single();
@@ -43,6 +59,11 @@ export async function signChecklistAction(checklistId: string) {
     .update({ signed_by: session.person.id, signed_at: new Date().toISOString() })
     .eq("id", checklistId);
   if (error) return { error: error.message };
+  await writeAuditLog({
+    entity_type: "quality_checklist",
+    entity_id: checklistId,
+    action: "sign",
+  });
   revalidatePath(`/quality-sentinel/checklists/${checklistId}`);
   return { ok: true };
 }
@@ -56,6 +77,11 @@ export async function completeChecklistAction(checklistId: string) {
     .update({ status: "completata" })
     .eq("id", checklistId);
   if (error) return { error: error.message };
+  await writeAuditLog({
+    entity_type: "quality_checklist",
+    entity_id: checklistId,
+    action: "complete",
+  });
 
   // Se è passata a non_conforme (trigger lo fa automaticamente per item critici NC), apri NC reale
   const { data: chk } = await supabase

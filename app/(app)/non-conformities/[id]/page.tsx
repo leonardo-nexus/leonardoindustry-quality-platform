@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createServerClient } from "@/lib/supabase/server";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 import { ActionForm } from "./action-form";
 import { NcCloseButton } from "./nc-close-button";
+import { NcEditPanel } from "./nc-edit-panel";
 
 const ACTION_STATUS_VARIANT: Record<string, "blue" | "yellow" | "green" | "red"> = {
   aperta: "blue",
@@ -49,12 +51,14 @@ export default async function NcDetailPage({ params }: { params: Promise<{ id: s
             <CardHeader>
               <CardTitle>Dettagli</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div><span className="font-medium">Descrizione: </span>{nc.description}</div>
-              <div><span className="font-medium">Rilevata il: </span>{format(new Date(nc.detected_at), "dd/MM/yyyy")}</div>
-              <div><span className="font-medium">Stato attuale: </span><Badge variant="outline">{nc.status}</Badge></div>
+            <CardContent>
+              <NcEditPanel nc={nc} />
+              <div className="mt-4 text-xs text-leo-muted">
+                Rilevata il {format(new Date(nc.detected_at), "dd/MM/yyyy")}
+              </div>
             </CardContent>
           </Card>
+          <AuditTrailPanel entityType="non_conformity" entityId={id} showRevisions={false} />
           <Card>
             <CardHeader>
               <CardTitle>Azioni correttive collegate</CardTitle>

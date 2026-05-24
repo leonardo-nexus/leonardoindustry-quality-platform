@@ -10,6 +10,8 @@ import { createServerClient } from "@/lib/supabase/server";
 import { RevisionForm } from "./revision-form";
 import { DownloadButton } from "./download-button";
 import { DeadlineBadge } from "@/components/status/deadline-badge";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
+import { DocumentEditPanel } from "./document-edit-panel";
 
 export default async function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -179,6 +181,16 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             </CardContent>
           </Card>
 
+          {/* Modifica anagrafica con audit trail */}
+          <Card className="leo-card">
+            <CardHeader>
+              <CardTitle className="text-base">Modifica documento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <DocumentEditPanel doc={doc} />
+            </CardContent>
+          </Card>
+
           {/* Nuova revisione */}
           <Card className="leo-card">
             <CardHeader>
@@ -188,6 +200,8 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
               <RevisionForm documentId={id} />
             </CardContent>
           </Card>
+
+          <AuditTrailPanel entityType="document" entityId={id} showRevisions />
         </div>
       </div>
     </>
