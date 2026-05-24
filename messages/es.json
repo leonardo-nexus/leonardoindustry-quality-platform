@@ -29,7 +29,8 @@
     "supplier_portal": "Portal del proveedor",
     "audit_log": "Registro auditoría",
     "calendar": "Calendario",
-    "interventions": "Intervenciones"
+    "interventions": "Intervenciones",
+    "erp_integration": "Integración ERP"
   },
   "actions": {
     "new": "Nuevo",

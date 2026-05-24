@@ -24,7 +24,7 @@ import {
   ShoppingCart,
   FileSignature,
 } from "lucide-react";
-import { HelpCircle, UserCheck, Truck, History, Calendar as CalendarIcon } from "lucide-react";
+import { HelpCircle, UserCheck, Truck, History, Calendar as CalendarIcon, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LeonardoLogo } from "./logo";
 import { useT } from "@/lib/i18n/client";
@@ -62,6 +62,7 @@ const NAV: { href: string; key: string; icon: any; roles: string | string[] }[] 
   { href: "/projects",           key: "nav.projects",         icon: Hammer,           roles: ["responsabile_qualita","responsabile_commessa","auditor","direzione_impresa","direzione_gruppo","responsabile_saldatura","capo_cantiere","capo_officina"] },
   { href: "/welding",            key: "nav.welding",          icon: Flame,            roles: ["responsabile_saldatura","saldatore","auditor","responsabile_qualita","direzione_impresa","direzione_gruppo"] },
   { href: "/audit-log",          key: "nav.audit_log",        icon: History,          roles: ["responsabile_qualita","auditor","direzione_impresa","direzione_gruppo"] },
+  { href: "/integrations/erp-quality", key: "nav.erp_integration", icon: ArrowLeftRight, roles: ["direzione_gruppo","direzione_impresa","responsabile_qualita"] },
   { href: "/help",               key: "nav.help",             icon: HelpCircle,       roles: ALL_ROLES },
   { href: "/settings",           key: "nav.settings",         icon: Settings,         roles: ["direzione_gruppo"] },
 ];
