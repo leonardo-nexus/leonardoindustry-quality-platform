@@ -33,6 +33,7 @@ export default async function ErpQualityIntegrationPage() {
         description="Sync bridge bidirezionale: outbox, log, conflitti, mapping global_id"
         actions={
           <div className="flex flex-wrap gap-2">
+            <Button asChild><Link href="/integrations/erp-quality/test">Esegui test suite</Link></Button>
             <Button asChild variant="outline"><Link href="/api/integrations/erp/status" target="_blank">Status JSON</Link></Button>
           </div>
         }
