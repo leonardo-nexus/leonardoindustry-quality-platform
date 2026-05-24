@@ -5,7 +5,8 @@ import { requireSession } from "@/lib/auth/session";
 export type AuditAction =
   | "create" | "update" | "delete" | "restore" | "approve" | "reject"
   | "archive" | "revise" | "complete" | "block" | "unblock" | "sign"
-  | "upload" | "download" | "import" | "export" | "escalate" | "dismiss" | "snooze";
+  | "upload" | "download" | "import" | "export" | "escalate" | "dismiss" | "snooze"
+  | "assign";
 
 export type AuditSource = "web" | "mobile" | "tablet" | "palmare" | "system" | "import" | "cron";
 

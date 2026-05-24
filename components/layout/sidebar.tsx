@@ -22,16 +22,19 @@ import {
   ShieldAlert,
   Package,
 } from "lucide-react";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, UserCheck, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LeonardoLogo } from "./logo";
 import { useT } from "@/lib/i18n/client";
 
 const NAV = [
+  { href: "/my-work", key: "nav.my_work", icon: UserCheck },
   { href: "/dashboard", key: "nav.dashboard", icon: LayoutDashboard },
   { href: "/quality-sentinel", key: "nav.quality_sentinel", icon: Shield },
   { href: "/quality-sentinel/risk", key: "nav.risk", icon: ShieldAlert },
   { href: "/materials", key: "nav.materials", icon: Package },
+  { href: "/materials/receptions", key: "nav.receptions", icon: Package },
+  { href: "/suppliers", key: "nav.suppliers", icon: Truck },
   { href: "/notifications", key: "nav.notifications", icon: Bell },
   { href: "/companies", key: "nav.companies", icon: Building2 },
   { href: "/processes", key: "nav.processes", icon: Workflow },
@@ -43,6 +46,7 @@ const NAV = [
   { href: "/non-conformities", key: "nav.non_conformities", icon: AlertTriangle },
   { href: "/actions", key: "nav.actions", icon: Wrench },
   { href: "/people", key: "nav.people", icon: Users },
+  { href: "/users", key: "nav.users", icon: Users },
   { href: "/assets", key: "nav.assets", icon: Boxes },
   { href: "/projects", key: "nav.projects", icon: Hammer },
   { href: "/welding", key: "nav.welding", icon: Flame },

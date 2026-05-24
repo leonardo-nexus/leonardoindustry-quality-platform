@@ -19,7 +19,11 @@
     "projects": "Commesse",
     "welding": "Saldatura 1090",
     "settings": "Impostazioni",
-    "help": "Guida operativa"
+    "help": "Guida operativa",
+    "users": "Utenti",
+    "my_work": "Il mio lavoro",
+    "receptions": "Ricezioni materiali",
+    "suppliers": "Fornitori"
   },
   "actions": {
     "new": "Nuovo",

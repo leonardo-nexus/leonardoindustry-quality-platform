@@ -25,6 +25,7 @@ const ACTION_META: Record<AuditAction, { Icon: any; label: string; color: string
   escalate:  { Icon: Lock,         label: "Escalation",    color: "text-status-orange" },
   dismiss:   { Icon: XCircle,      label: "Ignorato",      color: "text-leo-muted" },
   snooze:    { Icon: RotateCcw,    label: "Posticipato",   color: "text-status-yellow" },
+  assign:    { Icon: Plus,         label: "Assegnato",     color: "text-brand-cyan" },
 };
 
 /** Server component: storico audit + revisioni di un'entità */

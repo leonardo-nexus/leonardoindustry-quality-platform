@@ -19,7 +19,11 @@
     "projects": "Obras",
     "welding": "Soldadura 1090",
     "settings": "Ajustes",
-    "help": "Guía operativa"
+    "help": "Guía operativa",
+    "users": "Usuarios",
+    "my_work": "Mi trabajo",
+    "receptions": "Recepciones de materiales",
+    "suppliers": "Proveedores"
   },
   "actions": {
     "new": "Nuevo",
