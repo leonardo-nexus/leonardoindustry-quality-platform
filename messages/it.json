@@ -27,7 +27,9 @@
     "material_requests": "Richieste materiali",
     "material_orders": "Ordini materiali",
     "supplier_portal": "Portale fornitore",
-    "audit_log": "Audit log"
+    "audit_log": "Audit log",
+    "calendar": "Calendario",
+    "interventions": "Interventi"
   },
   "actions": {
     "new": "Nuovo",

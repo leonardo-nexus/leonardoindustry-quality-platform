@@ -24,7 +24,7 @@ import {
   ShoppingCart,
   FileSignature,
 } from "lucide-react";
-import { HelpCircle, UserCheck, Truck, History } from "lucide-react";
+import { HelpCircle, UserCheck, Truck, History, Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LeonardoLogo } from "./logo";
 import { useT } from "@/lib/i18n/client";
@@ -51,6 +51,7 @@ const NAV: { href: string; key: string; icon: any; roles: string | string[] }[] 
   { href: "/standards",          key: "nav.standards",        icon: BookCheck,        roles: ["responsabile_qualita","auditor","direzione_impresa","direzione_gruppo"] },
   { href: "/documents",          key: "nav.documents",        icon: FileText,         roles: ["responsabile_qualita","revisore","auditor","responsabile_commessa","responsabile_saldatura","responsabile_sicurezza","responsabile_ambiente","direzione_impresa","direzione_gruppo"] },
   { href: "/forms",              key: "nav.forms",            icon: FileSignature,    roles: ALL_ROLES },
+  { href: "/calendar",           key: "nav.calendar",         icon: CalendarIcon,     roles: ALL_ROLES },
   { href: "/deadlines",          key: "nav.deadlines",        icon: CalendarClock,    roles: ["responsabile_qualita","responsabile_commessa","direzione_impresa","direzione_gruppo","capo_cantiere","capo_officina"] },
   { href: "/audits",             key: "nav.audits",           icon: ClipboardCheck,   roles: ["auditor","responsabile_qualita","direzione_impresa","direzione_gruppo"] },
   { href: "/non-conformities",   key: "nav.non_conformities", icon: AlertTriangle,    roles: ["responsabile_qualita","responsabile_commessa","auditor","direzione_impresa","direzione_gruppo","responsabile_saldatura"] },

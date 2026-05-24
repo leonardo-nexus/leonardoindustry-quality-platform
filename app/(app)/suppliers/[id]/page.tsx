@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 
 const LEVEL_VARIANT: Record<string, "green" | "blue" | "yellow" | "orange" | "red"> = {
   eccellente: "green", affidabile: "blue", attenzione: "yellow", critico: "orange", inaffidabile: "red",
@@ -117,6 +118,13 @@ export default async function SupplierDetailPage({ params }: { params: Promise<{
             {(derogas.data?.length ?? 0) === 0 && <p className="text-xs text-leo-muted">Nessuna deroga</p>}
           </CardContent>
         </Card>
+
+        {/* Audit log fornitore (filtra solo eventi entity_type=supplier_score con id matching) */}
+        {score && (
+          <div className="lg:col-span-2">
+            <AuditTrailPanel entityType="supplier_score" entityId={score.id} showRevisions={false} />
+          </div>
+        )}
 
         {/* NC */}
         <Card className="leo-card lg:col-span-2">

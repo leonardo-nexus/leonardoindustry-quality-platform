@@ -183,6 +183,61 @@ export async function genericDeleteAction(
   return { ok: true };
 }
 
+export async function genericRestoreAction(
+  entityType: string,
+  entityId: string,
+  reason: string,
+  revalidateUrls: string[] = [],
+) {
+  ensureAllowed(entityType);
+  const session = await requireSession();
+  if (!session.person) return { error: "Profilo persona mancante" };
+  if (!reason || reason.trim().length < 3) return { error: "Motivo ripristino obbligatorio (min 3 caratteri)" };
+
+  const admin = createServiceRoleClient();
+  const { data: prev } = await admin.from(entityType).select("*").eq("id", entityId).maybeSingle();
+  if (!prev) return { error: "Record non trovato" };
+  if (!prev.deleted_at) return { error: "Record non è eliminato/archiviato" };
+
+  // Per documenti/procedure ripristina come bozza, per asset come fuori_servizio (safe)
+  const safeStatusMap: Record<string, string> = {
+    document: "bozza",
+    procedure: "bozza",
+    quality_plan: "bozza",
+    asset: "fuori_servizio",
+    wps: "bozza",
+    wpqr: "bozza",
+    welder_qualification: "in_scadenza",
+  };
+
+  const updates: Record<string, unknown> = {
+    deleted_at: null,
+    deleted_by: null,
+    delete_reason: null,
+    active: true,
+    updated_by: session.person.id,
+    updated_at: new Date().toISOString(),
+  };
+  if (entityType in safeStatusMap && "status" in prev) {
+    updates.status = safeStatusMap[entityType];
+  }
+
+  const { error } = await admin.from(entityType).update(updates).eq("id", entityId);
+  if (error) return { error: error.message };
+
+  await writeAuditLog({
+    entity_type: entityType,
+    entity_id: entityId,
+    action: "restore",
+    reason,
+    old_values: { deleted_at: prev.deleted_at, deleted_by: prev.deleted_by, delete_reason: prev.delete_reason },
+    new_values: updates,
+  });
+
+  for (const u of revalidateUrls) revalidatePath(u);
+  return { ok: true, restoredStatus: updates.status ?? null };
+}
+
 /**
  * Wrapper "manuale" usato da pagine che hanno già la propria server action di update:
  * crea audit_log + entity_revision in un colpo solo.

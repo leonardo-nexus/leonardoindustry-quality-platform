@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { createServerClient } from "@/lib/supabase/server";
 import { InspectionForm } from "./inspection-form";
 import { WeldStatusButtons } from "./status-buttons";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 
 const INSPECTION_RESULT_VARIANT: Record<string, "green" | "red" | "yellow"> = {
   conforme: "green",
@@ -97,6 +98,9 @@ export default async function WeldDetailPage({ params }: { params: Promise<{ id:
             <InspectionForm weldId={id} people={people ?? []} />
           </CardContent>
         </Card>
+      </div>
+      <div className="mt-6">
+        <AuditTrailPanel entityType="weld" entityId={id} showRevisions={false} />
       </div>
     </>
   );

@@ -1,13 +1,16 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { format } from "date-fns";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DeadlineBadge } from "@/components/status/deadline-badge";
+import { Wrench } from "lucide-react";
 import { createServerClient } from "@/lib/supabase/server";
 import { AssetEventForm } from "./event-form";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
+import { Button } from "@/components/ui/button";
 
 const RESULT_VARIANT: Record<string, "green" | "red" | "yellow"> = {
   conforme: "green",
@@ -36,6 +39,9 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
       <PageHeader
         title={`${asset.code} · ${asset.asset_type}`}
         description={`${(asset as any).company?.name} · ${asset.manufacturer ?? ""} ${asset.model ?? ""}`}
+        actions={
+          <Button asChild><Link href={`/assets/${id}/interventions`}><Wrench className="mr-1 h-3 w-3" /> Interventi/Manutenzioni</Link></Button>
+        }
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
