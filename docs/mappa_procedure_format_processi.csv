@@ -1,0 +1,27 @@
+procedura;titolo;processo;norme_collegate;format_collegati;automazione_principale
+P-01;Gestione informazione documentata;Documentazione;ISO 9001 7.5 / ISO 14001 7.5 / ISO 45001 7.5;FMT-DOC-01,FMT-DOC-02,FMT-DOC-03,FMT-DOC-04;scadenza revisione e blocco obsoleti
+P-02;Gestione rischi e opportunita;Rischi e opportunita;ISO 9001 6.1 / ISO 14001 6.1 / ISO 45001 6.1;FMT-RIS-01,FMT-RIS-02,FMT-RIS-03;revisione annuale e azioni per rischi alti
+P-03;Prodotti e servizi esterni;Fornitori e subappalti;ISO 9001 8.4;FMT-FOR-01,FMT-FOR-03,FMT-FOR-04;valutazione e rivalutazione fornitori
+P-03.1;Selezione subappalti;Fornitori e subappalti;ISO 9001 8.4 / ISO 45001 8.1;FMT-FOR-02;blocco subappaltatore con documenti scaduti
+P-04;Risorse umane;Risorse umane e formazione;ISO 9001 7.2 / ISO 45001 7.2 / ISO 14001 7.2;FMT-HR-01,FMT-HR-02,FMT-HR-03,FMT-HR-04,FMT-HR-05;scadenza formazione e blocco competenze
+P-05;Relazioni con clienti;Clienti e contratti;ISO 9001 8.2;FMT-CLI-01,FMT-CLI-02,FMT-CLI-03,FMT-CLI-04;verifica requisiti prima della commessa
+P-06;Pianificazione e controllo opere;Commesse e cantieri;ISO 9001 8.1 / ISO 9001 8.5;FMT-COM-01,FMT-COM-02,FMT-COM-03,FMT-COM-04,FMT-COM-05,FMT-COM-06;checklist apertura e blocco chiusura senza dossier
+P-07;Gestione NC e AC;Non conformita e azioni;ISO 9001 10.2 / ISO 14001 10.2 / ISO 45001 10.2;FMT-NC-01,FMT-NC-02,FMT-NC-03,FMT-NC-04,FMT-NC-05;NC non chiudibile senza verifica efficacia
+P-08;Infrastruttura;Infrastrutture e strumenti;ISO 9001 7.1.3 / ISO 9001 7.1.5;FMT-AST-01,FMT-AST-02,FMT-AST-03,FMT-AST-06;tarature manutenzioni e blocco asset scaduti
+P-09;Aspetti ambientali;Ambiente e consumi;ISO 14001 6.1.2;FMT-AMB-01;revisione annuale aspetti ambientali
+P-10;Audit interno;Audit;ISO 9001 9.2 / ISO 14001 9.2 / ISO 45001 9.2;FMT-AUD-01,FMT-AUD-02,FMT-AUD-03,FMT-AUD-04,FMT-AUD-05;rilievo non conforme genera NC
+P-11;Piano emergenze;Emergenze e antincendio;ISO 14001 8.2 / ISO 45001 8.2;FMT-SIC-04,FMT-AMB-04;prove emergenza e indagini
+P-12;Controllo operativo;Ambiente e consumi;ISO 14001 8.1;FMT-AMB-02,FMT-AMB-03,FMT-AMB-05;registri mensili e soglie ambiente
+P-13;Protezione contro incendi;Emergenze e antincendio;ISO 45001 8.1 / obblighi legali;FMT-AST-05;scadenze estintori e presidi antincendio
+P-14;Accidenti e incidenti;Incidenti e quasi incidenti;ISO 45001 10.2;FMT-INC-01,FMT-INC-02,FMT-SIC-02;incidente genera indagine e azione
+P-15;Equipos de inspeccion medicion ensayo;Infrastrutture e strumenti;ISO 9001 7.1.5 / UNE-EN 1090 controlli;FMT-AST-02,FMT-SAL-07,FMT-SAL-08;strumenti scaduti bloccano controlli
+P-16;Comprobacion resistencia continuidad;Produzione e controllo operativo;ISO 9001 8.5;FMT-COM-04;PPI digitale obbligatorio
+P-17;Tendido de cables;Produzione e controllo operativo;ISO 9001 8.5;FMT-COM-04;PPI digitale obbligatorio
+P-18;Conexionado cables;Produzione e controllo operativo;ISO 9001 8.5;FMT-COM-04;PPI digitale obbligatorio
+P-19;Hincado;Produzione e controllo operativo;ISO 9001 8.5;FMT-COM-04;checklist operativa
+P-20;Cerramiento;Produzione e controllo operativo;ISO 9001 8.5;FMT-COM-04;checklist operativa
+P-21;Taller;UNE-EN 1090 e saldatura;UNE-EN 1090-1 / UNE-EN 1090-2;FMT-SAL-10,FMT-COM-06;dossier CE obbligatorio
+P-22;Estructuras metalicas;UNE-EN 1090 e saldatura;UNE-EN 1090-2;FMT-SAL-04,FMT-SAL-05,FMT-SAL-07,FMT-SAL-08;tracciabilita materiali e controlli
+P-23;Soldeo por electrodo;UNE-EN 1090 e saldatura;ISO 15609 / ISO 15614 / ISO 9606 / ISO 3834;FMT-SAL-01,FMT-SAL-02,FMT-SAL-03,FMT-SAL-06,FMT-SAL-07;blocco senza WPS WPQR saldatore valido
+P-24;Soldeo con hilo;UNE-EN 1090 e saldatura;ISO 15609 / ISO 15614 / ISO 9606 / ISO 3834;FMT-SAL-01,FMT-SAL-02,FMT-SAL-03,FMT-SAL-06,FMT-SAL-07;blocco senza WPS WPQR saldatore valido
+P-25;Diseño y desarrollo;Commesse e cantieri;ISO 9001 8.3 / UNE-EN 1090 disegni;FMT-COM-01,FMT-COM-02;disegno approvato prima produzione

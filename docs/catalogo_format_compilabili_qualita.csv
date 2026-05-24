@@ -1,0 +1,64 @@
+codice;titolo;processo;procedura_collegata;categoria;genera_task;genera_nc;blocco_operativo;frequenza_suggerita
+FMT-DOC-01;Registro documenti;Documentazione;P-01;documentazione;si;no;no;continuo
+FMT-DOC-02;Richiesta nuova revisione;Documentazione;P-01;documentazione;si;no;no;evento
+FMT-DOC-03;Distribuzione documento;Documentazione;P-01;documentazione;si;no;no;evento
+FMT-DOC-04;Elenco documenti obsoleti;Documentazione;P-01;documentazione;no;no;si;continuo
+FMT-RIS-01;Matrice rischi e opportunita;Rischi e opportunita;P-02;rischi;si;no;no;annuale
+FMT-RIS-02;DAFO;Rischi e opportunita;P-02;rischi;si;no;no;annuale
+FMT-RIS-03;Parti interessate;Rischi e opportunita;P-02;rischi;si;no;no;annuale
+FMT-CLI-01;Verifica requisiti cliente;Clienti e contratti;P-05;clienti;si;si;si;commessa
+FMT-CLI-02;Riesame offerta contratto;Clienti e contratti;P-05;clienti;si;no;si;evento
+FMT-CLI-03;Modifica contrattuale;Clienti e contratti;P-05;clienti;si;si;no;evento
+FMT-CLI-04;Soddisfazione cliente;Clienti e contratti;P-05;clienti;si;si;no;fine_commessa
+FMT-FOR-01;Qualifica fornitore;Fornitori e subappalti;P-03;fornitori;si;no;si;evento
+FMT-FOR-02;Documenti obbligatori subappaltatore;Fornitori e subappalti;P-03.1;fornitori;si;no;si;commessa
+FMT-FOR-03;Valutazione annuale fornitore;Fornitori e subappalti;P-03;fornitori;si;si;no;annuale
+FMT-FOR-04;NC fornitore;Fornitori e subappalti;P-03;fornitori;si;si;no;evento
+FMT-HR-01;Scheda persona;Risorse umane e formazione;P-04;hr;si;no;no;continuo
+FMT-HR-02;Matrice competenze;Risorse umane e formazione;P-04;hr;si;no;si;continuo
+FMT-HR-03;Piano formazione;Risorse umane e formazione;P-04;hr;si;no;no;annuale
+FMT-HR-04;Registro formazione;Risorse umane e formazione;P-04;hr;si;no;no;evento
+FMT-HR-05;Abilitazioni e qualifiche;Risorse umane e formazione;P-04;hr;si;no;si;continuo
+FMT-COM-01;Apertura commessa;Commesse e cantieri;P-06;commesse;si;no;si;commessa
+FMT-COM-02;Piano qualita commessa;Commesse e cantieri;P-06;commesse;si;no;si;commessa
+FMT-COM-03;Checklist apertura cantiere;Commesse e cantieri;P-06;commesse;si;si;si;commessa
+FMT-COM-04;Piano controlli ITP PPI;Commesse e cantieri;P-06;commesse;si;si;si;commessa
+FMT-COM-05;Chiusura commessa;Commesse e cantieri;P-06;commesse;si;no;si;fine_commessa
+FMT-COM-06;Dossier finale;Commesse e cantieri;P-06;commesse;si;no;si;fine_commessa
+FMT-AST-01;Scheda asset;Infrastrutture e strumenti;P-08;asset;si;no;no;continuo
+FMT-AST-02;Registro tarature;Infrastrutture e strumenti;P-08;asset;si;si;si;periodica
+FMT-AST-03;Registro manutenzioni;Infrastrutture e strumenti;P-08;asset;si;si;si;periodica
+FMT-AST-04;Verifica saldatrice;Infrastrutture e strumenti;P-15;asset;si;si;si;periodica
+FMT-AST-05;Registro estintori;Emergenze e antincendio;P-13;asset;si;si;si;periodica
+FMT-AST-06;Registro veicoli;Infrastrutture e strumenti;P-08;asset;si;no;si;periodica
+FMT-AUD-01;Piano audit annuale;Audit;P-10;audit;si;no;no;annuale
+FMT-AUD-02;Programma audit;Audit;P-10;audit;si;no;no;evento
+FMT-AUD-03;Checklist audit;Audit;P-10;audit;si;si;no;audit
+FMT-AUD-04;Rapporto audit;Audit;P-10;audit;si;si;no;audit
+FMT-AUD-05;Follow-up audit;Audit;P-10;audit;si;no;no;audit
+FMT-NC-01;Apertura NC;Non conformita e azioni;P-07;nc;si;si;no;evento
+FMT-NC-02;Analisi causa;Non conformita e azioni;P-07;nc;si;no;no;evento
+FMT-NC-03;Trattamento immediato;Non conformita e azioni;P-07;nc;si;no;no;evento
+FMT-NC-04;Azione correttiva;Non conformita e azioni;P-07;nc;si;no;no;evento
+FMT-NC-05;Verifica efficacia;Non conformita e azioni;P-07;nc;si;no;si;evento
+FMT-AMB-01;Aspetti ambientali;Ambiente e consumi;P-09;ambiente;si;no;no;annuale
+FMT-AMB-02;Registro consumi;Ambiente e consumi;P-12;ambiente;si;no;no;mensile
+FMT-AMB-03;Registro rifiuti;Ambiente e consumi;P-12;ambiente;si;si;no;mensile
+FMT-AMB-04;Emergenza ambientale;Emergenze e antincendio;P-11;ambiente;si;si;no;evento
+FMT-AMB-05;Verifica controllo operativo ambientale;Ambiente e consumi;P-12;ambiente;si;si;no;periodica
+FMT-SIC-01;Valutazione rischio operativo;Sicurezza e salute sul lavoro;P-14;sicurezza;si;no;si;commessa
+FMT-SIC-02;Ispezione sicurezza;Sicurezza e salute sul lavoro;P-14;sicurezza;si;si;no;periodica
+FMT-SIC-03;Registro DPI;Sicurezza e salute sul lavoro;P-04;sicurezza;si;no;si;periodica
+FMT-SIC-04;Piano emergenza;Emergenze e antincendio;P-11;sicurezza;si;no;si;annuale
+FMT-INC-01;Segnalazione incidente quasi incidente;Incidenti e quasi incidenti;P-14;incidenti;si;si;no;evento
+FMT-INC-02;Indagine incidente;Incidenti e quasi incidenti;P-14;incidenti;si;si;no;evento
+FMT-SAL-01;Scheda WPS;UNE-EN 1090 e saldatura;P-23/P-24;saldatura;si;no;si;evento
+FMT-SAL-02;Scheda WPQR;UNE-EN 1090 e saldatura;P-23/P-24;saldatura;si;no;si;evento
+FMT-SAL-03;Qualifica saldatore;UNE-EN 1090 e saldatura;P-23/P-24;saldatura;si;no;si;periodica
+FMT-SAL-04;Registro materiali;UNE-EN 1090 e saldatura;P-22;saldatura;si;si;si;commessa
+FMT-SAL-05;Certificato materiale 3.1;UNE-EN 1090 e saldatura;P-22;saldatura;si;no;si;commessa
+FMT-SAL-06;Registro saldature;UNE-EN 1090 e saldatura;P-23/P-24;saldatura;si;si;si;commessa
+FMT-SAL-07;Controllo visivo VT;UNE-EN 1090 e saldatura;P-22/P-23/P-24;saldatura;si;si;si;saldatura
+FMT-SAL-08;Controllo CND;UNE-EN 1090 e saldatura;P-22/P-23/P-24;saldatura;si;si;si;saldatura
+FMT-SAL-09;Riparazione saldatura;UNE-EN 1090 e saldatura;P-23/P-24;saldatura;si;si;si;evento
+FMT-SAL-10;Dossier CE;UNE-EN 1090 e saldatura;P-21/P-22;saldatura;si;no;si;fine_commessa
