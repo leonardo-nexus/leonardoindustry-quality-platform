@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { createServerClient } from "@/lib/supabase/server";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 import { ContextualHelp } from "@/components/help/contextual-help";
+import { MobileEvidenceLayer } from "@/components/mobile/mobile-evidence-layer";
 import { ActionForm } from "./action-form";
 import { NcCloseButton } from "./nc-close-button";
 import { NcEditPanel } from "./nc-edit-panel";
@@ -98,6 +99,12 @@ export default async function NcDetailPage({ params }: { params: Promise<{ id: s
           </Card>
         </div>
         <div className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle className="text-base">Aggiungi evidenza mobile</CardTitle></CardHeader>
+            <CardContent>
+              <MobileEvidenceLayer context={{ entity_type: "non_conformity", entity_id: id, company_id: (nc as any).company?.id }} allowed={["foto","scan_documento","allegato"]} />
+            </CardContent>
+          </Card>
           <ContextualHelp topicSlug="gestione_nc" />
           <Card>
             <CardHeader>

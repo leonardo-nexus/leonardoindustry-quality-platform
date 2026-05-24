@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DeadlineBadge } from "@/components/status/deadline-badge";
 import { createServerClient } from "@/lib/supabase/server";
+import { StatusDonut } from "@/components/quality/quality-charts";
 
 const WPS_VARIANT: Record<string, "green" | "yellow" | "gray"> = {
   valida: "green",
@@ -29,7 +30,7 @@ export default async function WeldingHubPage() {
   const in30 = new Date(today); in30.setDate(today.getDate() + 30);
   const iso30 = in30.toISOString().slice(0, 10);
 
-  const [{ data: wpsList }, { data: qualifications }, { data: welds }] = await Promise.all([
+  const [{ data: wpsList }, { data: qualifications }, { data: welds }, { data: allWps }, { data: allQuals }, { data: allWelds }, { data: ceDossiers }] = await Promise.all([
     supabase
       .from("wps")
       .select("id, code, revision, status, welding_process:welding_process_id(code,name), company:company_id(name)")
@@ -47,7 +48,32 @@ export default async function WeldingHubPage() {
       .select("id, weld_number, status, welded_at, project:project_id(code,name), exc:execution_class_id(code), welder:welder_id(first_name,last_name)")
       .order("created_at", { ascending: false })
       .limit(30),
+    supabase.from("wps").select("status").eq("active", true),
+    supabase.from("welder_qualification").select("status, expiry_date"),
+    supabase.from("weld").select("status"),
+    supabase.from("ce_dossier").select("status").eq("active", true),
   ]);
+
+  // Aggregati per donut charts
+  function aggregate(rows: any[] | null, field: string): { name: string; value: number }[] {
+    const map: Record<string, number> = {};
+    (rows ?? []).forEach((r) => { const k = r[field] ?? "—"; map[k] = (map[k] ?? 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  }
+  const wpsAgg = aggregate(allWps, "status");
+  const weldAgg = aggregate(allWelds, "status");
+  const dossierAgg = aggregate(ceDossiers, "status");
+  // Qualifiche: in_scadenza se entro 30gg
+  const qualAgg: { name: string; value: number }[] = (() => {
+    const map: Record<string, number> = { valida: 0, in_scadenza: 0, scaduta: 0 };
+    (allQuals ?? []).forEach((q: any) => {
+      if (q.status === "scaduta") map.scaduta++;
+      else if (q.expiry_date && new Date(q.expiry_date) < new Date()) map.scaduta++;
+      else if (q.expiry_date && new Date(q.expiry_date) <= new Date(Date.now() + 30 * 86400000)) map.in_scadenza++;
+      else map.valida++;
+    });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  })();
 
   return (
     <>
@@ -61,6 +87,15 @@ export default async function WeldingHubPage() {
         <Link href="/welding/wpqr"><Card className="hover:bg-accent transition-colors cursor-pointer"><CardContent className="p-4 text-center"><div className="font-semibold">WPQR</div><div className="text-xs text-muted-foreground">Qualifiche procedure</div></CardContent></Card></Link>
         <Link href="/welding/welders"><Card className="hover:bg-accent transition-colors cursor-pointer"><CardContent className="p-4 text-center"><div className="font-semibold">Saldatori</div><div className="text-xs text-muted-foreground">Qualifiche personale</div></CardContent></Card></Link>
         <Link href="/welding/materials"><Card className="hover:bg-accent transition-colors cursor-pointer"><CardContent className="p-4 text-center"><div className="font-semibold">Materiali</div><div className="text-xs text-muted-foreground">Lotti e certificati</div></CardContent></Card></Link>
+      </div>
+
+      {/* Grafici saldatura/UNE-EN 1090 dettagliati */}
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-leo-muted">Quality Intelligence saldatura</h2>
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <Card className="leo-card"><CardHeader className="pb-2"><CardTitle className="text-sm">WPS per stato</CardTitle></CardHeader><CardContent><StatusDonut data={wpsAgg} /></CardContent></Card>
+        <Card className="leo-card"><CardHeader className="pb-2"><CardTitle className="text-sm">Qualifiche saldatori</CardTitle></CardHeader><CardContent><StatusDonut data={qualAgg} /></CardContent></Card>
+        <Card className="leo-card"><CardHeader className="pb-2"><CardTitle className="text-sm">Saldature per stato</CardTitle></CardHeader><CardContent><StatusDonut data={weldAgg} /></CardContent></Card>
+        <Card className="leo-card"><CardHeader className="pb-2"><CardTitle className="text-sm">Dossier CE</CardTitle></CardHeader><CardContent><StatusDonut data={dossierAgg} /></CardContent></Card>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

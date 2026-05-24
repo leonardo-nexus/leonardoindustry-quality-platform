@@ -27,6 +27,8 @@ const ALLOWED_ENTITIES = new Set([
   "contract_clause",
   "technical_sheet",
   "material_lot",
+  "ce_dossier",
+  "weld",
 ]);
 
 // Tabelle che devono creare entity_revision a ogni update significativo
@@ -41,6 +43,7 @@ const REVISIONABLE = new Set([
   "national_requirement",
   "contract",
   "technical_sheet",
+  "ce_dossier",
 ]);
 
 // Tabelle che NON possono essere eliminate se referenziate (forza archive)

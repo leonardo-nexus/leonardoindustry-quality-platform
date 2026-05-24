@@ -9,10 +9,13 @@ import { createServerClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { computeQualityScore, SCORE_LEVEL_TONE } from "@/lib/quality/score";
 import { getT } from "@/lib/i18n/dictionary";
+import { TrendLine } from "@/components/quality/quality-charts";
+import { getTrend30Days } from "@/lib/quality/snapshot";
 
 export default async function ExecutivePage() {
   const supabase = await createServerClient();
   const t = await getT();
+  const trend = await getTrend30Days("gruppo");
   const [
     { data: companies },
     { data: blockedProjects },
@@ -143,6 +146,18 @@ export default async function ExecutivePage() {
               );
             })}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Trend 30 giorni */}
+      <Card className="leo-card mb-6">
+        <CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-4 w-4 text-brand-cyan" /> Trend qualità gruppo · 30 giorni</CardTitle></CardHeader>
+        <CardContent>
+          {trend.length === 0 ? (
+            <p className="text-sm text-leo-muted">Nessun snapshot ancora. Il cron daily genera trend dal prossimo run o esegui manualmente /api/cron/quality-escalations.</p>
+          ) : (
+            <TrendLine data={trend.map((s: any) => ({ date: s.snapshot_date, score: s.score }))} />
+          )}
         </CardContent>
       </Card>
 

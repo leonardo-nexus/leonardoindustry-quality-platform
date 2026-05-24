@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runQualityEscalationsAction } from "@/app/(app)/quality-sentinel/reports/actions";
 import { emitCalendarReminders } from "@/lib/quality/calendar-reminders";
+import { snapshotDailyScores } from "@/lib/quality/snapshot";
 
 /**
  * Endpoint cron Vercel: esegue il pass escalation T-7/T-3/T-1/T/T+1/T+3/T+7.
@@ -31,7 +32,8 @@ export async function GET(req: NextRequest) {
   try {
     const r = await runQualityEscalationsAction();
     const cal = await emitCalendarReminders();
-    return NextResponse.json({ ...r, calendar: cal, ranAt: new Date().toISOString() });
+    const snap = await snapshotDailyScores();
+    return NextResponse.json({ ...r, calendar: cal, snapshot: snap, ranAt: new Date().toISOString() });
   } catch (err) {
     return NextResponse.json(
       { error: (err as Error).message, ranAt: new Date().toISOString() },
