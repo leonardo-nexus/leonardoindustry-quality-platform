@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext } from "react";
 import it from "@/messages/it.json";
-import { lookup } from "./dictionary";
+import { lookup } from "./lookup";
 import type { Locale } from "./config";
 
 type Dict = typeof it;

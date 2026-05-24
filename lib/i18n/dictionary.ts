@@ -4,8 +4,11 @@ import it from "@/messages/it.json";
 import es from "@/messages/es.json";
 import { createServerClient } from "@/lib/supabase/server";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale, type Locale } from "./config";
+import { lookup } from "./lookup";
 
 const DICTS: Record<Locale, typeof it> = { it, es: es as typeof it };
+
+export { lookup };
 
 /** Risolve la locale corrente:
  *  1) cookie utente
@@ -37,21 +40,6 @@ export async function getCurrentLocale(): Promise<Locale> {
 export async function getDictionary(): Promise<typeof it> {
   const locale = await getCurrentLocale();
   return DICTS[locale];
-}
-
-/** Lookup chiave "nav.dashboard" → string. Interpola {placeholder} se vars passati. */
-export function lookup(dict: typeof it, path: string, vars?: Record<string, string | number>): string {
-  const parts = path.split(".");
-  let cur: any = dict;
-  for (const p of parts) {
-    cur = cur?.[p];
-    if (cur == null) return path; // chiave mancante: ritorna chiave per debug visivo
-  }
-  if (typeof cur !== "string") return path;
-  if (vars) {
-    return Object.keys(vars).reduce((acc, k) => acc.replaceAll(`{${k}}`, String(vars[k])), cur);
-  }
-  return cur;
 }
 
 /** Server-side helper: getT() restituisce funzione t(key, vars?) con dizionario corrente caricato. */
