@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createServerClient } from "@/lib/supabase/server";
 import { DrawingForm } from "./drawing-form";
@@ -42,6 +43,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       <PageHeader
         title={`${project.code} · ${project.name}`}
         description={`${(project as any).company?.name} · ${project.customer_name ?? "—"} · EXC ${(project as any).execution_class?.code ?? "—"}`}
+        actions={
+          <Button asChild>
+            <Link href={`/quality-sentinel/plans/${id}`}>Piano qualità</Link>
+          </Button>
+        }
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">

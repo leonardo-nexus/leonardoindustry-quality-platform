@@ -17,12 +17,16 @@ import {
   Flame,
   Hammer,
   Settings,
+  Shield,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LeonardoLogo } from "./logo";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/quality-sentinel", label: "Quality Sentinel", icon: Shield },
+  { href: "/notifications", label: "Notifiche", icon: Bell },
   { href: "/companies", label: "Imprese", icon: Building2 },
   { href: "/processes", label: "Processi", icon: Workflow },
   { href: "/standards", label: "Norme", icon: BookCheck },
