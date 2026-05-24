@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
+import { QualityPopupLoader } from "@/components/quality/quality-popup-loader";
 import { requireSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 
@@ -36,6 +37,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+      <QualityPopupLoader />
     </div>
   );
 }

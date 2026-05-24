@@ -1,11 +1,17 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Camera, Paperclip, Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { setItemResultAction, signChecklistAction, completeChecklistAction } from "./actions";
+import {
+  setItemResultAction,
+  signChecklistAction,
+  completeChecklistAction,
+  uploadChecklistItemEvidenceAction,
+} from "./actions";
 
 const RESULT_VARIANT: Record<string, "gray" | "green" | "red" | "yellow" | "blue"> = {
   non_compilato: "gray",
@@ -61,13 +67,105 @@ export function ChecklistItemControl({ item, checklistId }: { item: any; checkli
         <Button size="sm" variant="outline" disabled={isPending} onClick={() => setResult("limitato")}>~ Limitato</Button>
         <Button size="sm" variant="ghost" disabled={isPending} onClick={() => setResult("non_applicabile")}>N/A</Button>
       </div>
-      {item.attachment_required && !item.attachment_file_id && (
-        <p className="mt-2 text-xs text-status-orange">⚠ Allegato obbligatorio (upload in arrivo nello sprint mobile)</p>
-      )}
+      <EvidenceUploader itemId={item.id} hasAttachment={!!item.attachment_file_id} required={!!item.attachment_required} />
       {item.compiled_by && (
         <p className="mt-2 text-[10px] text-leo-muted">
           Compilato da {item.compiled_by.first_name} {item.compiled_by.last_name}
         </p>
+      )}
+    </div>
+  );
+}
+
+function EvidenceUploader({ itemId, hasAttachment, required }: { itemId: string; hasAttachment: boolean; required: boolean }) {
+  const router = useRouter();
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleUpload(file: File | null) {
+    if (!file) return;
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("device_info", `${navigator.userAgent} · ${window.screen.width}x${window.screen.height}`);
+
+      // Geolocation best-effort (non bloccante)
+      const geoPromise = new Promise<GeolocationPosition | null>((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve(pos),
+          () => resolve(null),
+          { timeout: 3000, enableHighAccuracy: false },
+        );
+      });
+      const pos = await geoPromise;
+      if (pos) {
+        fd.append("latitude", String(pos.coords.latitude));
+        fd.append("longitude", String(pos.coords.longitude));
+      }
+
+      const r = await uploadChecklistItemEvidenceAction(itemId, fd);
+      if (r?.error) toast.error(r.error);
+      else {
+        if (r.duplicate) {
+          toast.warning("Evidenza caricata ma SOSPETTA: stessa foto già usata altrove (SHA256 duplicato)");
+        } else if ((r.suspicion_flags?.length ?? 0) > 0) {
+          toast.warning(`Evidenza caricata con flag: ${r.suspicion_flags!.join(", ")}`);
+        } else {
+          toast.success("Evidenza caricata correttamente");
+        }
+        router.refresh();
+      }
+    });
+  }
+
+  return (
+    <div className="mt-2 space-y-1.5">
+      <div className="flex flex-wrap gap-1.5">
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => handleUpload(e.target.files?.[0] ?? null)}
+        />
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*,application/pdf"
+          className="hidden"
+          onChange={(e) => handleUpload(e.target.files?.[0] ?? null)}
+        />
+        <Button
+          size="sm"
+          variant={hasAttachment ? "outline" : (required ? "destructive" : "secondary")}
+          disabled={isPending}
+          onClick={() => cameraRef.current?.click()}
+          className="flex items-center gap-1"
+        >
+          {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+          Scatta foto
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={isPending}
+          onClick={() => fileRef.current?.click()}
+          className="flex items-center gap-1"
+        >
+          <Paperclip className="h-3 w-3" />
+          Allega file
+        </Button>
+        {hasAttachment && (
+          <Badge variant="green" className="flex items-center gap-1 text-[10px]">
+            <CheckCircle2 className="h-3 w-3" /> evidenza presente
+          </Badge>
+        )}
+      </div>
+      {required && !hasAttachment && (
+        <p className="text-xs text-status-orange">⚠ Allegato obbligatorio per chiudere la checklist</p>
       )}
     </div>
   );
