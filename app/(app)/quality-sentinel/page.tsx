@@ -13,9 +13,12 @@ import { cn } from "@/lib/utils";
 import { computeQualityScore, SCORE_LEVEL_TONE } from "@/lib/quality/score";
 import { CompanyScoreChart, StatusDonut } from "@/components/quality/quality-charts";
 import { QualityCoach } from "@/components/quality/quality-coach";
+import { getT, getCurrentLocale } from "@/lib/i18n/dictionary";
 
 export default async function QualitySentinelPage() {
   const supabase = await createServerClient();
+  const t = await getT();
+  const locale = await getCurrentLocale();
 
   const [
     { count: openBlocks },
@@ -104,14 +107,14 @@ export default async function QualitySentinelPage() {
   return (
     <>
       <PageHeader
-        title="Quality Sentinel"
-        description="Quality Control Operating System · indice qualità · grafici · coach operativo · feed eventi"
+        title={t("qs.title")}
+        description={t("qs.subtitle")}
         actions={
-          <div className="flex gap-2">
-            <Button asChild variant="outline"><Link href="/notifications">Notifiche</Link></Button>
-            <Button asChild variant="outline" className="border-status-red/40 text-status-red hover:bg-status-red/10"><Link href="/quality-sentinel/risk">⚠ Rischio economico</Link></Button>
-            <Button asChild variant="outline"><Link href="/quality-sentinel/reports">Report criticità</Link></Button>
-            <Button asChild><Link href="/quality-sentinel/executive">Vista direzione</Link></Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline"><Link href="/notifications">{t("nav.notifications")}</Link></Button>
+            <Button asChild variant="outline" className="border-status-red/40 text-status-red hover:bg-status-red/10"><Link href="/quality-sentinel/risk">⚠ {t("nav.risk")}</Link></Button>
+            <Button asChild variant="outline"><Link href="/quality-sentinel/reports">{t("qs.reports")}</Link></Button>
+            <Button asChild><Link href="/quality-sentinel/executive">{t("qs.executive")}</Link></Button>
           </div>
         }
       />
@@ -122,7 +125,7 @@ export default async function QualitySentinelPage() {
             <div className="flex items-center gap-4">
               <Shield className={cn("h-12 w-12", tone.color)} />
               <div>
-                <div className="text-xs uppercase tracking-wider text-leo-muted">Indice qualità gruppo Leonardoindustry</div>
+                <div className="text-xs uppercase tracking-wider text-leo-muted">{t("qs.group_score")} Leonardoindustry</div>
                 <div className={cn("text-5xl font-bold", tone.color)}>{groupScore.score}<span className="text-2xl text-leo-muted">/100</span></div>
                 <div className={cn("text-sm font-semibold", tone.color)}>{tone.label}</div>
               </div>

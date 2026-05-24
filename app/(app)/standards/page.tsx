@@ -4,9 +4,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { createServerClient } from "@/lib/supabase/server";
 import { StandardForm, RequirementForm } from "./standard-forms";
+import { OcaCertificationBadges } from "@/components/layout/oca-certification-badges";
+import { getCurrentLocale } from "@/lib/i18n/dictionary";
 
 export default async function StandardsPage() {
   const supabase = await createServerClient();
+  const locale = await getCurrentLocale();
   const { data: standards } = await supabase
     .from("standard")
     .select("id, code, version, title")
@@ -20,9 +23,14 @@ export default async function StandardsPage() {
   return (
     <>
       <PageHeader
-        title="Norme e requisiti"
-        description="ISO 9001 / 45001 / 14001, UNE-EN 1090 e norme correlate"
+        title={locale === "es" ? "Normas y requisitos" : "Norme e requisiti"}
+        description="ISO 9001 / 45001 / 14001, UNE-EN 1090"
       />
+
+      <div className="mb-6">
+        <OcaCertificationBadges locale={locale} />
+      </div>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <Card>

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
+import { getCurrentLocale, getT } from "@/lib/i18n/dictionary";
 
 const CATEGORY_LABEL: Record<string, string> = {
   contratto_non_verificato: "Contratto non verificato",
@@ -31,6 +32,8 @@ const SEVERITY_VARIANT: Record<string, "yellow" | "orange" | "red" | "outline"> 
 
 export default async function RiskDashboardPage() {
   const supabase = await createServerClient();
+  const locale = await getCurrentLocale();
+  const t = await getT();
 
   const [
     { data: openEvents, count: openCount },
@@ -61,10 +64,12 @@ export default async function RiskDashboardPage() {
   return (
     <>
       <PageHeader
-        title="Dashboard rischio economico"
-        description="Loss Prevention — cosa sta facendo perdere soldi e tempo al gruppo, in tempo reale"
+        title={locale === "es" ? "Panel de riesgo económico" : "Dashboard rischio economico"}
+        description={locale === "es"
+          ? "Loss Prevention — qué está haciendo perder dinero y tiempo al grupo, en tiempo real"
+          : "Loss Prevention — cosa sta facendo perdere soldi e tempo al gruppo, in tempo reale"}
         actions={
-          <Button asChild variant="outline"><Link href="/quality-sentinel">← Quality Sentinel</Link></Button>
+          <Button asChild variant="outline"><Link href="/quality-sentinel">← {t("qs.title")}</Link></Button>
         }
       />
 

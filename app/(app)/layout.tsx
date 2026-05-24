@@ -5,6 +5,7 @@ import { requireSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getCurrentLocale, getDictionary } from "@/lib/i18n/dictionary";
+import { OcaCertificationBadges } from "@/components/layout/oca-certification-badges";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession();
@@ -39,7 +40,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             companyLogoUrl={companyLogoUrl}
             roleCode={session.person?.role_code ?? null}
           />
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          <main className="flex-1 overflow-y-auto p-6">
+            {children}
+            <footer className="mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-leo-border pt-3 text-[10px] text-leo-muted">
+              <span>© Leonardoindustry Quality Platform</span>
+              <OcaCertificationBadges variant="compact" locale={locale} />
+            </footer>
+          </main>
         </div>
         <QualityPopupLoader />
       </div>
