@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AlertOctagon, ShieldAlert } from "lucide-react";
-import { createServerClient } from "@/lib/supabase/server";
 
 export interface LossPreventionItem {
   label: string;
@@ -52,24 +51,12 @@ export function LossPreventionBanner({ items, title }: { items: LossPreventionIt
 
 /**
  * Server component: legge gli ostacoli all'avvio commessa e mostra il banner.
+ * Usa canStartProject che ora include i gate fornitore.
  */
 export async function ProjectStartupBanner({ projectId }: { projectId: string }) {
-  const supabase = await createServerClient();
-  const { data: chk } = await supabase
-    .from("project_startup_check")
-    .select("*")
-    .eq("project_id", projectId)
-    .maybeSingle();
-  if (!chk || chk.is_unlocked) return null;
+  const { canStartProject, blockersToBannerItems } = await import("@/lib/quality/loss-prevention");
+  const gate = await canStartProject(projectId);
+  if (gate.blockers.length === 0) return null;
 
-  const items: LossPreventionItem[] = [];
-  if (!chk.contract_uploaded) items.push({ label: "Contratto non caricato", detail: "richiesto prima dell'avvio commessa", action_url: `/projects/${projectId}/contracts`, severity: "blocco" });
-  if (!chk.contract_verified) items.push({ label: "Contratto non verificato", detail: "responsabile qualità deve confermare lettura", action_url: `/projects/${projectId}/contracts`, severity: "blocco" });
-  if (!chk.contract_read_checklist_done) items.push({ label: "Checklist lettura contratto incompleta", detail: "FMT-CON-01 da compilare", action_url: `/projects/${projectId}/contracts`, severity: "blocco" });
-  if (!chk.critical_clauses_reviewed) items.push({ label: "Clausole critiche non analizzate", detail: "FMT-CON-02 mancante o aperto", action_url: `/projects/${projectId}/contracts`, severity: "blocco" });
-  if (!chk.quality_plan_generated) items.push({ label: "Piano qualità non generato", detail: "manca selezione template + generazione", action_url: `/projects/${projectId}/quality-plan`, severity: "blocco" });
-  if (!chk.quality_responsible_assigned) items.push({ label: "Responsabile qualità non assegnato", detail: "obbligatorio per avvio", action_url: `/projects/${projectId}`, severity: "critico" });
-  if (!chk.technical_sheets_uploaded) items.push({ label: "Schede tecniche non caricate", detail: "almeno una scheda materiale richiesta", action_url: `/projects/${projectId}/technical-sheets`, severity: "critico" });
-
-  return <LossPreventionBanner items={items} title="BLOCCO AVVIO COMMESSA" />;
+  return <LossPreventionBanner items={blockersToBannerItems(gate.blockers)} title={gate.is_unlocked ? "ATTENZIONE COMMESSA" : "BLOCCO AVVIO COMMESSA"} />;
 }

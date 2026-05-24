@@ -72,6 +72,65 @@ export async function canStartProject(projectId: string): Promise<StartupGateRes
   const quality_responsible_assigned = !!(proj as any)?.quality_responsible_id;
   const applicable_norms_selected = Array.isArray((proj as any)?.applicable_standards) && (proj as any).applicable_standards.length > 0;
 
+  // ===== GATE FORNITORI =====
+  const { data: orders } = await admin
+    .from("material_order")
+    .select("id, supplier_name, status, deleted_at")
+    .eq("project_id", projectId)
+    .is("deleted_at", null)
+    .neq("status", "annullato");
+
+  const { data: derogas } = await admin
+    .from("supplier_deroga")
+    .select("id, reason")
+    .eq("project_id", projectId)
+    .gte("signed_at", new Date(Date.now() - 90 * 86400_000).toISOString());
+
+  const { data: scoresLow } = await admin
+    .from("supplier_score")
+    .select("supplier_name, score, level")
+    .in("supplier_name", (orders ?? []).map((o: any) => o.supplier_name).filter(Boolean))
+    .in("level", ["critico", "inaffidabile"]);
+
+  // Per ogni ordine: verifica autorizzazioni produzione + consegna
+  const orderBlockers: BlockReason[] = [];
+  for (const o of orders ?? []) {
+    const { data: prodAuth } = await admin
+      .from("supplier_authorization")
+      .select("status, production_signed_at")
+      .eq("material_order_id", o.id)
+      .eq("gate_type", "produzione")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (o.status === "in_produzione" && (!prodAuth || prodAuth.status !== "autorizzata" || !prodAuth.production_signed_at)) {
+      orderBlockers.push({
+        code: `prod_unauth_${o.id}`,
+        label: `Produzione fornitore ${o.supplier_name} NON autorizzata`,
+        detail: "ordine in produzione senza firma interna",
+        severity: "critico",
+        action_url: `/material-orders/${o.id}`,
+      });
+    }
+    const { data: delAuth } = await admin
+      .from("supplier_authorization")
+      .select("status, delivery_signed_at")
+      .eq("material_order_id", o.id)
+      .eq("gate_type", "spedizione")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (o.status === "in_spedizione" && (!delAuth || delAuth.status !== "autorizzata" || !delAuth.delivery_signed_at)) {
+      orderBlockers.push({
+        code: `del_unauth_${o.id}`,
+        label: `Consegna fornitore ${o.supplier_name} NON autorizzata`,
+        detail: "manca verifica spazio/mezzi/personale",
+        severity: "blocco",
+        action_url: `/material-orders/${o.id}`,
+      });
+    }
+  }
+
   const row = {
     project_id: projectId,
     contract_uploaded,
@@ -83,7 +142,7 @@ export async function canStartProject(projectId: string): Promise<StartupGateRes
     quality_plan_generated,
     applicable_norms_selected,
     quality_responsible_assigned,
-    suppliers_verified: true,
+    suppliers_verified: orderBlockers.length === 0 && (scoresLow?.length ?? 0) === 0,
     last_check_at: new Date().toISOString(),
   };
 
@@ -98,6 +157,27 @@ export async function canStartProject(projectId: string): Promise<StartupGateRes
   if (!quality_plan_generated) blockers.push({ code: "no_quality_plan", label: "Piano qualità non generato", detail: "selezionare template e generare", severity: "blocco", action_url: `/projects/${projectId}/quality-plan` });
   if (!quality_responsible_assigned) blockers.push({ code: "no_responsible", label: "Responsabile qualità non assegnato", detail: "assegnare in anagrafica commessa", severity: "critico", action_url: `/projects/${projectId}` });
   if (!technical_sheets_uploaded) blockers.push({ code: "no_tech_sheets", label: "Schede tecniche non caricate", detail: "almeno una scheda materiale richiesta", severity: "critico", action_url: `/projects/${projectId}/technical-sheets` });
+
+  // Aggiunge i blockers fornitore
+  for (const ob of orderBlockers) blockers.push(ob);
+  for (const s of scoresLow ?? []) {
+    blockers.push({
+      code: `low_supplier_${s.supplier_name}`,
+      label: `Fornitore critico: ${s.supplier_name}`,
+      detail: `score ${s.score}/100 livello ${s.level}`,
+      severity: "critico",
+      action_url: `/suppliers`,
+    });
+  }
+  for (const d of derogas ?? []) {
+    blockers.push({
+      code: `deroga_${d.id}`,
+      label: `Deroga fornitore aperta (90gg)`,
+      detail: d.reason?.slice(0, 80) ?? "—",
+      severity: "critico",
+      action_url: `/suppliers`,
+    });
+  }
 
   return {
     is_unlocked: blockers.filter((b) => b.severity === "blocco").length === 0,

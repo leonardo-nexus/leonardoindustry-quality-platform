@@ -132,18 +132,18 @@ export function ReceptionFlow({ reception }: { reception: any }) {
             <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Note generali" className="mb-2" />
             <Textarea rows={2} value={damageNotes} onChange={(e) => setDamageNotes(e.target.value)} placeholder="Note danni / anomalie" className="mb-3" />
             {!canSign && <p className="mb-2 text-xs text-status-orange">⚠ Per firmare servono tutte le 4 foto + conteggio</p>}
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" disabled={pending || !canSign} onClick={() => sign("conforme")} className="bg-status-green/20 text-status-green hover:bg-status-green/30 border border-status-green/40">
-                <CheckCircle2 className="mr-1 h-3 w-3" /> Firma CONFORME
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <Button disabled={pending || !canSign} onClick={() => sign("conforme")} className="mobile-action bg-status-green/20 text-status-green hover:bg-status-green/30 border border-status-green/40">
+                <CheckCircle2 className="mr-2 h-5 w-5" /> Firma CONFORME
               </Button>
-              <Button size="sm" variant="outline" disabled={pending || !canSign} onClick={() => sign("parziale")} className="border-status-orange/40 text-status-orange">
+              <Button variant="outline" disabled={pending || !canSign} onClick={() => sign("parziale")} className="mobile-action border-status-orange/40 text-status-orange">
                 Parziale
               </Button>
-              <Button size="sm" variant="outline" disabled={pending || !canSign} onClick={() => sign("non_conforme")} className="border-status-red/40 text-status-red">
-                <AlertTriangle className="mr-1 h-3 w-3" /> NON conforme (apre NC)
+              <Button variant="outline" disabled={pending || !canSign} onClick={() => sign("non_conforme")} className="mobile-action border-status-red/40 text-status-red">
+                <AlertTriangle className="mr-2 h-5 w-5" /> NON conforme (apre NC)
               </Button>
-              <Button size="sm" variant="destructive" disabled={pending || !canSign} onClick={() => sign("bloccato")}>
-                <AlertTriangle className="mr-1 h-3 w-3" /> BLOCCATO (apre NC + loss)
+              <Button variant="destructive" disabled={pending || !canSign} onClick={() => sign("bloccato")} className="mobile-action">
+                <AlertTriangle className="mr-2 h-5 w-5" /> BLOCCATO (apre NC + loss)
               </Button>
             </div>
           </>
@@ -182,18 +182,18 @@ function PhotoUploader({ receptionId, type, label, uploaded, disabled }: { recep
   }
 
   return (
-    <div className="text-center">
+    <div>
       <input ref={ref} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
-      <Button
-        size="sm"
-        variant={uploaded ? "outline" : "secondary"}
+      <button
+        type="button"
         disabled={pending || disabled}
         onClick={() => ref.current?.click()}
-        className="w-full text-xs"
+        className={uploaded ? "mobile-camera-btn-done w-full" : "mobile-camera-btn w-full disabled:opacity-50"}
       >
-        {pending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : uploaded ? <CheckCircle2 className="mr-1 h-3 w-3 text-status-green" /> : <Camera className="mr-1 h-3 w-3" />}
-        {label}
-      </Button>
+        {pending ? <Loader2 className="h-6 w-6 animate-spin" /> : uploaded ? <CheckCircle2 className="h-6 w-6 text-status-green" /> : <Camera className="h-6 w-6 text-brand-cyan" />}
+        <span className="font-medium">{label}</span>
+        {uploaded && <span className="text-[10px] text-status-green">✓ caricata</span>}
+      </button>
     </div>
   );
 }

@@ -104,4 +104,20 @@
       animation: none !important;
     }
   }
+
+  /* ============================================================
+     Mobile-first: tap target 44px+ su pulsanti/azioni operatore
+     ============================================================ */
+  .mobile-action {
+    @apply min-h-[44px] text-base font-semibold;
+  }
+  .mobile-card {
+    @apply rounded-lg border-2 p-4 shadow-md;
+  }
+  .mobile-camera-btn {
+    @apply flex h-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-brand-cyan/40 bg-leo-card text-xs;
+  }
+  .mobile-camera-btn-done {
+    @apply flex h-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-status-green/60 bg-status-green/10 text-xs;
+  }
 }

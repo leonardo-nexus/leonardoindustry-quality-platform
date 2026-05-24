@@ -23,7 +23,10 @@
     "users": "Usuarios",
     "my_work": "Mi trabajo",
     "receptions": "Recepciones de materiales",
-    "suppliers": "Proveedores"
+    "suppliers": "Proveedores",
+    "material_requests": "Solicitudes de material",
+    "material_orders": "Pedidos de material",
+    "supplier_portal": "Portal del proveedor"
   },
   "actions": {
     "new": "Nuevo",
