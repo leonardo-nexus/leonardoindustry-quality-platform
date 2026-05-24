@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { dismissPopupAction, snoozePopupAction } from "@/app/actions/popup-dismissal";
+import { useT } from "@/lib/i18n/client";
 
 export interface QualityPopupItem {
   id: string;
@@ -58,6 +59,7 @@ const KIND_META = {
 } as const;
 
 export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
+  const { t } = useT();
   const [pending, setPending] = useState<QualityPopupItem[]>([]);
   const [current, setCurrent] = useState<QualityPopupItem | null>(null);
   const [showDismissForm, setShowDismissForm] = useState(false);
@@ -123,7 +125,7 @@ export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
             <Icon className={`h-6 w-6 ${meta.color}`} />
             <Badge variant="red" className="text-[10px]">{meta.label}</Badge>
             {remaining > 1 && (
-              <span className="ml-auto text-xs text-leo-muted">{remaining} avvisi attivi</span>
+              <span className="ml-auto text-xs text-leo-muted">{t("popup.remaining", { count: remaining })}</span>
             )}
           </div>
           <DialogTitle className="mt-3 text-base">{current.title}</DialogTitle>
@@ -139,33 +141,33 @@ export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
           </div>
           {current.estimated_loss_euro != null && (
             <div className="mt-2 rounded-md border border-status-red/40 bg-status-red/10 px-3 py-2 text-sm font-medium text-status-red">
-              Rischio economico stimato: {Number(current.estimated_loss_euro).toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
+              {t("popup.estimated_loss")}: {Number(current.estimated_loss_euro).toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
             </div>
           )}
         </DialogHeader>
         {showDismissForm ? (
           <div className="space-y-2 border-t border-leo-border pt-3">
-            <label className="block text-xs text-leo-muted">Motivo per ignorare (obbligatorio, viene tracciato in audit log)</label>
-            <Textarea rows={2} value={dismissReason} onChange={(e) => setDismissReason(e.target.value)} placeholder="Es: già gestito offline, non applicabile a questa fase, ..." />
+            <label className="block text-xs text-leo-muted">{t("popup.reason_to_dismiss")}</label>
+            <Textarea rows={2} value={dismissReason} onChange={(e) => setDismissReason(e.target.value)} />
             <div className="flex justify-end gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(false)} disabled={isSubmitting}>Annulla</Button>
-              <Button size="sm" variant="destructive" onClick={submitDismiss} disabled={isSubmitting}>Conferma ignora</Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(false)} disabled={isSubmitting}>{t("actions.cancel")}</Button>
+              <Button size="sm" variant="destructive" onClick={submitDismiss} disabled={isSubmitting}>{t("popup.confirm_dismiss")}</Button>
             </div>
           </div>
         ) : (
           <DialogFooter className="flex-row justify-end gap-2 sm:gap-2">
             <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(4)} disabled={isSubmitting}>
-              <Clock className="mr-1 h-3 w-3" /> Snooze 4h
+              <Clock className="mr-1 h-3 w-3" /> {t("popup.snooze_4h")}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(24)} disabled={isSubmitting}>
-              <Clock className="mr-1 h-3 w-3" /> 24h
+              <Clock className="mr-1 h-3 w-3" /> {t("popup.snooze_24h")}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(true)} disabled={isSubmitting} className="text-status-red">
-              <X className="mr-1 h-3 w-3" /> Ignora con motivo
+              <X className="mr-1 h-3 w-3" /> {t("actions.dismiss_with_reason")}
             </Button>
             <Button asChild size="sm">
               <Link href={current.action_url} onClick={() => snoozeCurrent(1)}>
-                Vai a risolvere →
+                {t("actions.go_to_resolve")} →
               </Link>
             </Button>
           </DialogFooter>

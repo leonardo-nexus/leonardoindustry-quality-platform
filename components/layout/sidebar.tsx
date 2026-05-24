@@ -22,33 +22,37 @@ import {
   ShieldAlert,
   Package,
 } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LeonardoLogo } from "./logo";
+import { useT } from "@/lib/i18n/client";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/quality-sentinel", label: "Quality Sentinel", icon: Shield },
-  { href: "/quality-sentinel/risk", label: "Rischio economico", icon: ShieldAlert },
-  { href: "/materials", label: "Materiali", icon: Package },
-  { href: "/notifications", label: "Notifiche", icon: Bell },
-  { href: "/companies", label: "Imprese", icon: Building2 },
-  { href: "/processes", label: "Processi", icon: Workflow },
-  { href: "/standards", label: "Norme", icon: BookCheck },
-  { href: "/documents", label: "Documenti", icon: FileText },
-  { href: "/forms", label: "Format compilabili", icon: ClipboardList },
-  { href: "/deadlines", label: "Scadenze", icon: CalendarClock },
-  { href: "/audits", label: "Audit", icon: ClipboardCheck },
-  { href: "/non-conformities", label: "Non conformità", icon: AlertTriangle },
-  { href: "/actions", label: "Azioni", icon: Wrench },
-  { href: "/people", label: "Persone", icon: Users },
-  { href: "/assets", label: "Asset", icon: Boxes },
-  { href: "/projects", label: "Commesse", icon: Hammer },
-  { href: "/welding", label: "Saldatura 1090", icon: Flame },
-  { href: "/settings", label: "Impostazioni", icon: Settings },
+  { href: "/dashboard", key: "nav.dashboard", icon: LayoutDashboard },
+  { href: "/quality-sentinel", key: "nav.quality_sentinel", icon: Shield },
+  { href: "/quality-sentinel/risk", key: "nav.risk", icon: ShieldAlert },
+  { href: "/materials", key: "nav.materials", icon: Package },
+  { href: "/notifications", key: "nav.notifications", icon: Bell },
+  { href: "/companies", key: "nav.companies", icon: Building2 },
+  { href: "/processes", key: "nav.processes", icon: Workflow },
+  { href: "/standards", key: "nav.standards", icon: BookCheck },
+  { href: "/documents", key: "nav.documents", icon: FileText },
+  { href: "/forms", key: "nav.forms", icon: ClipboardList },
+  { href: "/deadlines", key: "nav.deadlines", icon: CalendarClock },
+  { href: "/audits", key: "nav.audits", icon: ClipboardCheck },
+  { href: "/non-conformities", key: "nav.non_conformities", icon: AlertTriangle },
+  { href: "/actions", key: "nav.actions", icon: Wrench },
+  { href: "/people", key: "nav.people", icon: Users },
+  { href: "/assets", key: "nav.assets", icon: Boxes },
+  { href: "/projects", key: "nav.projects", icon: Hammer },
+  { href: "/welding", key: "nav.welding", icon: Flame },
+  { href: "/help", key: "nav.help", icon: HelpCircle },
+  { href: "/settings", key: "nav.settings", icon: Settings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { t } = useT();
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col bg-leo-sidebar border-r border-leo-border">
       <div className="flex h-16 items-center border-b border-leo-border px-4">
@@ -75,7 +79,7 @@ export function Sidebar() {
                   active ? "text-brand-cyan" : "text-leo-muted group-hover:text-white",
                 )}
               />
-              <span>{item.label}</span>
+              <span>{t(item.key)}</span>
             </Link>
           );
         })}

@@ -10,6 +10,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { ProjectStartupBanner } from "@/components/quality/loss-prevention-banner";
 import { canStartProject } from "@/lib/quality/loss-prevention";
 import { VerifyContractButton, ClauseStatusSelect, NewContractForm, NewClauseForm } from "./contract-actions-ui";
+import { ContextualHelp } from "@/components/help/contextual-help";
 
 const SEVERITY_VARIANT: Record<string, "yellow" | "orange" | "red" | "outline"> = {
   info: "outline", attenzione: "yellow", urgente: "orange", critico: "red", blocco: "red",
@@ -148,6 +149,7 @@ export default async function ProjectContractsPage({ params }: { params: Promise
             </CardContent>
           </Card>
 
+          <ContextualHelp topicSlug="verifica_contratto" />
           <Card className="leo-card border-status-orange/40">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-status-orange" /> Perché serve</CardTitle>

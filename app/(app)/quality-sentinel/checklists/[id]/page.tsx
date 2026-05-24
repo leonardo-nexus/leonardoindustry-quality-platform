@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 import { ChecklistItemControl, CompleteButton, SignButton } from "./controls";
+import { ContextualHelp } from "@/components/help/contextual-help";
 
 export default async function ChecklistDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -121,6 +122,8 @@ export default async function ChecklistDetail({ params }: { params: Promise<{ id
               )}
             </CardContent>
           </Card>
+
+          <ContextualHelp topicSlug="checklist_obbligatorie" compact />
 
           <AuditTrailPanel entityType="quality_checklist" entityId={id} showRevisions />
         </div>

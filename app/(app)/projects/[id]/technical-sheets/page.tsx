@@ -10,6 +10,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { ProjectStartupBanner } from "@/components/quality/loss-prevention-banner";
 import { canStartProject } from "@/lib/quality/loss-prevention";
 import { ApproveSheetButton, NewSheetForm } from "./sheet-actions-ui";
+import { ContextualHelp } from "@/components/help/contextual-help";
 
 const STATUS_VARIANT: Record<string, "yellow" | "orange" | "green" | "red" | "gray"> = {
   da_approvare: "orange", approvata: "green", obsoleta: "gray", contestata: "red", archiviata: "gray",
@@ -94,6 +95,7 @@ export default async function ProjectTechnicalSheetsPage({ params }: { params: P
         </div>
 
         <div className="space-y-4">
+          <ContextualHelp topicSlug="schede_tecniche" />
           <Card className="leo-card">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2"><Plus className="h-4 w-4" /> Nuova scheda tecnica</CardTitle>

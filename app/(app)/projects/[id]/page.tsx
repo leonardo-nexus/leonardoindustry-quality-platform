@@ -10,6 +10,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { DrawingForm } from "./drawing-form";
 import { ProjectStartupBanner } from "@/components/quality/loss-prevention-banner";
 import { canStartProject } from "@/lib/quality/loss-prevention";
+import { ContextualHelp } from "@/components/help/contextual-help";
 
 const DRAWING_STATUS_VARIANT: Record<string, "yellow" | "green" | "gray"> = {
   bozza: "yellow",
@@ -140,14 +141,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             </CardContent>
           </Card>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Nuovo disegno</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DrawingForm projectId={id} />
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <ContextualHelp topicSlug="apertura_commessa" />
+          <Card>
+            <CardHeader>
+              <CardTitle>Nuovo disegno</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <DrawingForm projectId={id} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );

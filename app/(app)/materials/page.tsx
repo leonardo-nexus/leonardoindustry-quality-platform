@@ -38,7 +38,7 @@ export default async function MaterialsIndexPage() {
             <p className="text-sm text-leo-muted text-center py-6">Nessun lotto registrato</p>
           ) : (
             (lots ?? []).map((l: any) => (
-              <Link key={l.id} href={l.project ? `/projects/${l.project.id}/materials#lot-${l.id}` : "#"} className="flex items-center justify-between rounded-md border border-leo-border bg-leo-card/40 px-3 py-2 text-sm hover:bg-leo-card">
+              <Link key={l.id} href={`/materials/${l.id}`} className="flex items-center justify-between rounded-md border border-leo-border bg-leo-card/40 px-3 py-2 text-sm hover:bg-leo-card">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     {l.status === "bloccato" && <Lock className="h-3 w-3 text-status-red" />}

@@ -1,6 +1,8 @@
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, HelpCircle } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "./language-switcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +50,11 @@ export function Topbar({
           </span>
         )}
       </div>
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
+        <Button asChild variant="ghost" size="sm" className="px-2 text-leo-muted hover:text-brand-cyan" aria-label="Guida operativa">
+          <Link href="/help"><HelpCircle className="h-4 w-4" /></Link>
+        </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-2 text-leo-text hover:bg-leo-card/60">
@@ -72,6 +79,7 @@ export function Topbar({
           </form>
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
     </header>
   );
 }

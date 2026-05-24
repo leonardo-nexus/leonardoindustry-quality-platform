@@ -9,6 +9,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { LossPreventionBanner } from "@/components/quality/loss-prevention-banner";
 import { canUseMaterial } from "@/lib/quality/loss-prevention";
 import { VerifyMaterialButton, RecheckButton, NewMaterialLotForm } from "./material-actions-ui";
+import { ContextualHelp } from "@/components/help/contextual-help";
 
 const STATUS_VARIANT: Record<string, "yellow" | "orange" | "green" | "red" | "gray"> = {
   in_attesa_verifica: "yellow", verificato: "green", bloccato: "red", utilizzato: "gray", scartato: "gray",
@@ -140,6 +141,7 @@ export default async function ProjectMaterialsPage({ params }: { params: Promise
         </div>
 
         <div className="space-y-4">
+          <ContextualHelp topicSlug="ricezione_materiali" />
           <Card className="leo-card">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2"><Plus className="h-4 w-4" /> Registra nuovo lotto</CardTitle>

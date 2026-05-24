@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createServerClient } from "@/lib/supabase/server";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
+import { ContextualHelp } from "@/components/help/contextual-help";
 import { ActionForm } from "./action-form";
 import { NcCloseButton } from "./nc-close-button";
 import { NcEditPanel } from "./nc-edit-panel";
@@ -96,18 +97,21 @@ export default async function NcDetailPage({ params }: { params: Promise<{ id: s
             </CardContent>
           </Card>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Apri azione correttiva</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ActionForm
-              ncId={id}
-              companyId={(nc as any).company.id}
-              people={people ?? []}
-            />
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <ContextualHelp topicSlug="gestione_nc" />
+          <Card>
+            <CardHeader>
+              <CardTitle>Apri azione correttiva</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ActionForm
+                ncId={id}
+                companyId={(nc as any).company.id}
+                people={people ?? []}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );
