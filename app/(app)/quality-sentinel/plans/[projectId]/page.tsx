@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { GeneratePlanForm } from "./generate-plan-form";
+import { ProjectStartupBanner } from "@/components/quality/loss-prevention-banner";
+import { canStartProject } from "@/lib/quality/loss-prevention";
 
 const PHASE_STATUS_VARIANT: Record<string, "gray" | "yellow" | "red" | "green"> = {
   non_avviata: "gray",
@@ -27,6 +29,7 @@ export default async function ProjectQualityPlanPage({ params }: { params: Promi
     .eq("id", projectId)
     .maybeSingle();
   if (!project) notFound();
+  await canStartProject(projectId);
 
   const { data: plan } = await supabase
     .from("quality_plan")
@@ -47,11 +50,14 @@ export default async function ProjectQualityPlanPage({ params }: { params: Promi
           title={`Piano qualità — ${project.code}`}
           description={`${(project as any).company?.name} · ${project.name}`}
           actions={
-            <Button asChild variant="outline">
-              <Link href={`/projects/${projectId}`}>← Commessa</Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild variant="outline"><Link href={`/projects/${projectId}/contracts`}>Contratti</Link></Button>
+              <Button asChild variant="outline"><Link href={`/projects/${projectId}/materials`}>Materiali</Link></Button>
+              <Button asChild variant="outline"><Link href={`/projects/${projectId}`}>← Commessa</Link></Button>
+            </div>
           }
         />
+        <ProjectStartupBanner projectId={projectId} />
         <Card className="leo-card max-w-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -99,6 +105,8 @@ export default async function ProjectQualityPlanPage({ params }: { params: Promi
           </Button>
         }
       />
+
+      <ProjectStartupBanner projectId={projectId} />
 
       {/* Riepilogo */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

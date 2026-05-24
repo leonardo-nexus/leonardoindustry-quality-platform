@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { AlertOctagon, Lock, AlertTriangle, X, ShieldAlert } from "lucide-react";
+import { toast } from "sonner";
+import { AlertOctagon, Lock, AlertTriangle, X, ShieldAlert, Clock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { dismissPopupAction, snoozePopupAction } from "@/app/actions/popup-dismissal";
 
 export interface QualityPopupItem {
   id: string;
@@ -26,9 +29,11 @@ export interface QualityPopupItem {
   estimated_loss_euro?: number | null;
 }
 
-const SESSION_KEY = "qsentinel:popups_dismissed";
+// I dismiss/snooze sono persistiti server-side in popup_dismissal con audit_log.
+// In client serve solo un cache di sessione per non rishowarli subito senza refresh.
+const SESSION_KEY = "qsentinel:popups_dismissed_local";
 
-function readDismissed(): Set<string> {
+function readDismissedLocal(): Set<string> {
   if (typeof window === "undefined") return new Set();
   try {
     const raw = sessionStorage.getItem(SESSION_KEY);
@@ -39,7 +44,7 @@ function readDismissed(): Set<string> {
   }
 }
 
-function writeDismissed(set: Set<string>) {
+function writeDismissedLocal(set: Set<string>) {
   try {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(Array.from(set)));
   } catch {}
@@ -55,22 +60,54 @@ const KIND_META = {
 export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
   const [pending, setPending] = useState<QualityPopupItem[]>([]);
   const [current, setCurrent] = useState<QualityPopupItem | null>(null);
+  const [showDismissForm, setShowDismissForm] = useState(false);
+  const [dismissReason, setDismissReason] = useState("");
+  const [isSubmitting, startTransition] = useTransition();
 
   useEffect(() => {
-    const dismissed = readDismissed();
+    const dismissed = readDismissedLocal();
     const remaining = items.filter((i) => !dismissed.has(`${i.kind}:${i.id}`));
     setPending(remaining);
     if (remaining.length > 0) setCurrent(remaining[0]);
   }, [items]);
 
-  function dismissCurrent() {
+  function advanceToNext() {
     if (!current) return;
-    const dismissed = readDismissed();
+    const dismissed = readDismissedLocal();
     dismissed.add(`${current.kind}:${current.id}`);
-    writeDismissed(dismissed);
+    writeDismissedLocal(dismissed);
     const rest = pending.filter((p) => p.id !== current.id);
     setPending(rest);
     setCurrent(rest[0] ?? null);
+    setShowDismissForm(false);
+    setDismissReason("");
+  }
+
+  function submitDismiss() {
+    if (!current) return;
+    if (dismissReason.trim().length < 3) {
+      toast.error("Motivo obbligatorio (min 3 caratteri) per ignorare un alert critico");
+      return;
+    }
+    startTransition(async () => {
+      const r = await dismissPopupAction(current.kind, current.id, dismissReason.trim());
+      if (r?.error) toast.error(r.error);
+      else { toast.success("Alert ignorato e tracciato in audit log"); advanceToNext(); }
+    });
+  }
+
+  function snoozeCurrent(hours: number) {
+    if (!current) return;
+    startTransition(async () => {
+      const r = await snoozePopupAction(current.kind, current.id, hours);
+      if (r?.error) toast.error(r.error);
+      else { toast.success(`Snooze ${hours}h registrato`); advanceToNext(); }
+    });
+  }
+
+  // dismissCurrent = solo "ricorda dopo" senza motivo: snooze 4h
+  function dismissCurrent() {
+    snoozeCurrent(4);
   }
 
   if (!current) return null;
@@ -106,16 +143,33 @@ export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
             </div>
           )}
         </DialogHeader>
-        <DialogFooter className="flex-row justify-end gap-2 sm:gap-2">
-          <Button variant="ghost" size="sm" onClick={dismissCurrent}>
-            <X className="mr-1 h-3 w-3" /> Ricorda dopo
-          </Button>
-          <Button asChild size="sm">
-            <Link href={current.action_url} onClick={dismissCurrent}>
-              Vai a risolvere →
-            </Link>
-          </Button>
-        </DialogFooter>
+        {showDismissForm ? (
+          <div className="space-y-2 border-t border-leo-border pt-3">
+            <label className="block text-xs text-leo-muted">Motivo per ignorare (obbligatorio, viene tracciato in audit log)</label>
+            <Textarea rows={2} value={dismissReason} onChange={(e) => setDismissReason(e.target.value)} placeholder="Es: già gestito offline, non applicabile a questa fase, ..." />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(false)} disabled={isSubmitting}>Annulla</Button>
+              <Button size="sm" variant="destructive" onClick={submitDismiss} disabled={isSubmitting}>Conferma ignora</Button>
+            </div>
+          </div>
+        ) : (
+          <DialogFooter className="flex-row justify-end gap-2 sm:gap-2">
+            <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(4)} disabled={isSubmitting}>
+              <Clock className="mr-1 h-3 w-3" /> Snooze 4h
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(24)} disabled={isSubmitting}>
+              <Clock className="mr-1 h-3 w-3" /> 24h
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(true)} disabled={isSubmitting} className="text-status-red">
+              <X className="mr-1 h-3 w-3" /> Ignora con motivo
+            </Button>
+            <Button asChild size="sm">
+              <Link href={current.action_url} onClick={() => snoozeCurrent(1)}>
+                Vai a risolvere →
+              </Link>
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

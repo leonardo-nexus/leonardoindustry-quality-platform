@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createServerClient } from "@/lib/supabase/server";
 import { DrawingForm } from "./drawing-form";
+import { ProjectStartupBanner } from "@/components/quality/loss-prevention-banner";
+import { canStartProject } from "@/lib/quality/loss-prevention";
 
 const DRAWING_STATUS_VARIANT: Record<string, "yellow" | "green" | "gray"> = {
   bozza: "yellow",
@@ -25,6 +27,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     .eq("id", id)
     .maybeSingle();
   if (!project) notFound();
+
+  // Refresh startup gate ad ogni visita: garantisce banner sempre aggiornato
+  await canStartProject(id);
 
   const { data: drawings } = await supabase
     .from("drawing")
@@ -44,11 +49,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         title={`${project.code} · ${project.name}`}
         description={`${(project as any).company?.name} · ${project.customer_name ?? "—"} · EXC ${(project as any).execution_class?.code ?? "—"}`}
         actions={
-          <Button asChild>
-            <Link href={`/quality-sentinel/plans/${id}`}>Piano qualità</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline"><Link href={`/projects/${id}/contracts`}>Contratti</Link></Button>
+            <Button asChild variant="outline"><Link href={`/projects/${id}/technical-sheets`}>Schede tecniche</Link></Button>
+            <Button asChild variant="outline"><Link href={`/projects/${id}/materials`}>Materiali</Link></Button>
+            <Button asChild><Link href={`/quality-sentinel/plans/${id}`}>Piano qualità</Link></Button>
+          </div>
         }
       />
+
+      <ProjectStartupBanner projectId={id} />
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <Card>

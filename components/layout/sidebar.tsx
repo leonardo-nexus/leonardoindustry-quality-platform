@@ -19,6 +19,8 @@ import {
   Settings,
   Shield,
   Bell,
+  ShieldAlert,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LeonardoLogo } from "./logo";
@@ -26,6 +28,8 @@ import { LeonardoLogo } from "./logo";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/quality-sentinel", label: "Quality Sentinel", icon: Shield },
+  { href: "/quality-sentinel/risk", label: "Rischio economico", icon: ShieldAlert },
+  { href: "/materials", label: "Materiali", icon: Package },
   { href: "/notifications", label: "Notifiche", icon: Bell },
   { href: "/companies", label: "Imprese", icon: Building2 },
   { href: "/processes", label: "Processi", icon: Workflow },

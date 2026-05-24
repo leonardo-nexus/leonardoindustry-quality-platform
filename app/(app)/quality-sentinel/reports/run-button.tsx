@@ -17,7 +17,8 @@ export function RunEscalationsButton() {
           const r = await runQualityEscalationsAction();
           if (r?.error) toast.error(r.error);
           else {
-            toast.success(`Escalation eseguite: ${r.created} notifiche generate · ${r.escalated} elementi escalati`);
+            const windows = r.windows ? Object.entries(r.windows).filter(([_, n]) => (n as number) > 0).map(([k, n]) => `${k}:${n}`).join(" · ") : "";
+            toast.success(`Escalation: ${r.created} notifiche · ${r.escalated} a direzione${windows ? ` (${windows})` : ""}`);
             router.refresh();
           }
         })

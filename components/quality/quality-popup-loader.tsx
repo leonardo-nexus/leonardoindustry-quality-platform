@@ -102,6 +102,26 @@ export async function QualityPopupLoader() {
     });
   }
 
+  // Filtra via i popup dismissati o snoozzati ancora attivi per questa persona
+  if (items.length > 0 && session.person) {
+    const { data: dismissals } = await supabase
+      .from("popup_dismissal")
+      .select("kind, entity_id, action, snooze_until")
+      .eq("person_id", session.person.id);
+    const now = Date.now();
+    const blockedKeys = new Set<string>();
+    for (const d of dismissals ?? []) {
+      const key = `${d.kind}:${d.entity_id}`;
+      if (d.action === "dismiss") blockedKeys.add(key);
+      else if (d.action === "snooze" && d.snooze_until && new Date(d.snooze_until).getTime() > now) blockedKeys.add(key);
+    }
+    if (blockedKeys.size > 0) {
+      const filtered = items.filter((i) => !blockedKeys.has(`${i.kind}:${i.id}`));
+      if (filtered.length === 0) return null;
+      return <QualityPopupManager items={filtered} />;
+    }
+  }
+
   if (items.length === 0) return null;
   return <QualityPopupManager items={items} />;
 }
