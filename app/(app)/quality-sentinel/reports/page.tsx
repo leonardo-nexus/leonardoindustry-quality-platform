@@ -7,9 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { RunEscalationsButton } from "./run-button";
+import { getT, getCurrentLocale } from "@/lib/i18n/dictionary";
 
 export default async function ReportsPage() {
   const supabase = await createServerClient();
+  const t = await getT();
+  const locale = await getCurrentLocale();
   const today = new Date().toISOString().slice(0, 10);
   const in7 = new Date(); in7.setDate(in7.getDate() + 7);
   const iso7 = in7.toISOString().slice(0, 10);
@@ -31,12 +34,12 @@ export default async function ReportsPage() {
   return (
     <>
       <PageHeader
-        title="Report criticità qualità"
-        description="Cosa non va · chi deve agire · entro quando · rischio se non fatto"
+        title={locale === "es" ? "Informes de criticidad calidad" : "Report criticità qualità"}
+        description={locale === "es" ? "Qué no funciona · quién debe actuar · cuándo · riesgo si no se hace" : "Cosa non va · chi deve agire · entro quando · rischio se non fatto"}
         actions={
           <div className="flex gap-2">
             <RunEscalationsButton />
-            <Button asChild variant="outline"><Link href="/quality-sentinel">← Quality Sentinel</Link></Button>
+            <Button asChild variant="outline"><Link href="/quality-sentinel">← {t("qs.title")}</Link></Button>
           </div>
         }
       />

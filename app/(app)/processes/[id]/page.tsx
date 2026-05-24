@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createServerClient } from "@/lib/supabase/server";
 import { LinkRequirementForm } from "./link-requirement-form";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 
 export default async function ProcessDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -333,6 +334,10 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           </div>
         </CardContent>
       </Card>
+
+      <div className="mt-6">
+        <AuditTrailPanel entityType="process" entityId={id} showRevisions={false} />
+      </div>
     </>
   );
 }

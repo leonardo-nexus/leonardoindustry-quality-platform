@@ -12,6 +12,7 @@ import { LossPreventionBanner } from "@/components/quality/loss-prevention-banne
 import { canSupplierProduce, canSupplierDeliver, canReceiveMaterial } from "@/lib/quality/supplier-gates";
 import { blockersToBannerItems } from "@/lib/quality/loss-prevention";
 import { OrderActions } from "./order-actions";
+import { OrderEditPanel } from "./order-edit-panel";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -66,6 +67,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <Row label="Valore" value={order.total_value_euro ? Number(order.total_value_euro).toLocaleString("it-IT", { style: "currency", currency: "EUR" }) : "—"} />
               <Row label="Commessa" value={(order as any).project?.code ?? "—"} />
             </CardContent>
+          </Card>
+
+          {/* Edit panel */}
+          <Card className="leo-card">
+            <CardHeader><CardTitle className="text-base">Modifica ordine</CardTitle></CardHeader>
+            <CardContent><OrderEditPanel order={order} /></CardContent>
           </Card>
 
           {/* Action buttons */}

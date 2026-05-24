@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 import { ApproveRejectButtons } from "./approve-reject";
+import { RequestEditPanel } from "./request-edit-panel";
 
 export default async function MaterialRequestDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -34,6 +35,12 @@ export default async function MaterialRequestDetail({ params }: { params: Promis
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
+          <Card className="leo-card">
+            <CardHeader><CardTitle className="text-base">Modifica</CardTitle></CardHeader>
+            <CardContent>
+              <RequestEditPanel request={req} />
+            </CardContent>
+          </Card>
           <Card className="leo-card">
             <CardHeader><CardTitle className="text-base">Dettagli</CardTitle></CardHeader>
             <CardContent className="space-y-2 text-sm">

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { requireSession } from "@/lib/auth/session";
 import { MarkReadButton } from "./mark-read-button";
+import { getCurrentLocale } from "@/lib/i18n/dictionary";
 
 const SEVERITY_ICON: Record<string, { icon: any; tone: string; bg: string }> = {
   info: { icon: Bell, tone: "text-leo-muted", bg: "border-leo-border" },
@@ -28,6 +29,7 @@ const STATUS_VARIANT: Record<string, "blue" | "gray" | "yellow" | "green" | "red
 
 export default async function NotificationsPage({ searchParams }: { searchParams: Promise<{ filter?: string }> }) {
   const params = await searchParams;
+  const locale = await getCurrentLocale();
   const session = await requireSession();
   const supabase = await createServerClient();
 
@@ -54,8 +56,10 @@ export default async function NotificationsPage({ searchParams }: { searchParams
   return (
     <>
       <PageHeader
-        title="Centro notifiche"
-        description={`${unreadCount} non lette · ${recipients?.length ?? 0} totali`}
+        title={locale === "es" ? "Centro de notificaciones" : "Centro notifiche"}
+        description={locale === "es"
+          ? `${unreadCount} no leídas · ${recipients?.length ?? 0} totales`
+          : `${unreadCount} non lette · ${recipients?.length ?? 0} totali`}
       />
 
       <div className="mb-4 flex gap-2 text-sm">

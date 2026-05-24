@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createServerClient } from "@/lib/supabase/server";
 import { VerifyForm } from "./verify-form";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 
 export default async function ActionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -64,6 +65,9 @@ export default async function ActionDetailPage({ params }: { params: Promise<{ i
             </CardContent>
           </Card>
         )}
+      </div>
+      <div className="mt-6">
+        <AuditTrailPanel entityType="corrective_action" entityId={id} showRevisions={false} />
       </div>
     </>
   );

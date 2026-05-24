@@ -26,7 +26,8 @@
     "suppliers": "Proveedores",
     "material_requests": "Solicitudes de material",
     "material_orders": "Pedidos de material",
-    "supplier_portal": "Portal del proveedor"
+    "supplier_portal": "Portal del proveedor",
+    "audit_log": "Registro auditoría"
   },
   "actions": {
     "new": "Nuevo",

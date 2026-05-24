@@ -29,11 +29,11 @@ export function ApproveRejectButtons({ requestId }: { requestId: string }) {
   }
   return (
     <>
-      <Button size="sm" disabled={pending} onClick={() => setShowAppr(true)} className="border-status-green/40 text-status-green hover:bg-status-green/10" variant="outline">
-        <CheckCircle2 className="mr-1 h-3 w-3" /> Approva
+      <Button disabled={pending} onClick={() => setShowAppr(true)} className="mobile-action border-status-green/40 text-status-green hover:bg-status-green/10" variant="outline">
+        <CheckCircle2 className="mr-2 h-4 w-4" /> Approva
       </Button>
-      <Button size="sm" disabled={pending} onClick={() => setShowRej(true)} variant="outline" className="border-status-red/40 text-status-red hover:bg-status-red/10">
-        <XCircle className="mr-1 h-3 w-3" /> Respingi
+      <Button disabled={pending} onClick={() => setShowRej(true)} variant="outline" className="mobile-action border-status-red/40 text-status-red hover:bg-status-red/10">
+        <XCircle className="mr-2 h-4 w-4" /> Respingi
       </Button>
       <ChangeReasonDialog open={showAppr} onCancel={() => setShowAppr(false)} onConfirm={approve} title="Approva richiesta" required />
       <ChangeReasonDialog open={showRej} onCancel={() => setShowRej(false)} onConfirm={reject} title="Respingi richiesta" required />

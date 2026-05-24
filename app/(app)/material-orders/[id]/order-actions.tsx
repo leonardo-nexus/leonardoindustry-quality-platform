@@ -38,17 +38,17 @@ export function OrderActions({ order, prodGateUnlocked, delGateUnlocked, magazzi
       <CardHeader><CardTitle className="text-base">Azioni ordine</CardTitle></CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <Button onClick={() => setShowProd(true)} disabled={pending} variant={prodGateUnlocked ? "outline" : "secondary"} className="justify-start">
-            <CheckCircle2 className="mr-2 h-4 w-4" /> {prodGateUnlocked ? "✓ Autorizzata" : "Autorizza produzione"}
+          <Button onClick={() => setShowProd(true)} disabled={pending} variant={prodGateUnlocked ? "outline" : "secondary"} className="mobile-action justify-start">
+            <CheckCircle2 className="mr-2 h-5 w-5" /> {prodGateUnlocked ? "✓ Autorizzata" : "Autorizza produzione"}
           </Button>
-          <Button onClick={() => setShowDel(true)} disabled={pending} variant={delGateUnlocked ? "outline" : "secondary"} className="justify-start">
-            <Truck className="mr-2 h-4 w-4" /> {delGateUnlocked ? "✓ Autorizzata" : "Autorizza consegna"}
+          <Button onClick={() => setShowDel(true)} disabled={pending} variant={delGateUnlocked ? "outline" : "secondary"} className="mobile-action justify-start">
+            <Truck className="mr-2 h-5 w-5" /> {delGateUnlocked ? "✓ Autorizzata" : "Autorizza consegna"}
           </Button>
-          <Button onClick={() => setShowReception(true)} disabled={pending} variant="outline" className="justify-start">
-            <Package className="mr-2 h-4 w-4" /> Crea ricezione
+          <Button onClick={() => setShowReception(true)} disabled={pending} variant="outline" className="mobile-action justify-start">
+            <Package className="mr-2 h-5 w-5" /> Crea ricezione
           </Button>
-          <Button onClick={() => setShowDeroga(true)} disabled={pending} variant="ghost" className="justify-start text-status-red">
-            <AlertOctagon className="mr-2 h-4 w-4" /> Deroga (firmata)
+          <Button onClick={() => setShowDeroga(true)} disabled={pending} variant="ghost" className="mobile-action justify-start text-status-red">
+            <AlertOctagon className="mr-2 h-5 w-5" /> Deroga (firmata)
           </Button>
         </div>
       </CardContent>

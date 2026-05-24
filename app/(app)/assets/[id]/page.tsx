@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DeadlineBadge } from "@/components/status/deadline-badge";
 import { createServerClient } from "@/lib/supabase/server";
 import { AssetEventForm } from "./event-form";
+import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 
 const RESULT_VARIANT: Record<string, "green" | "red" | "yellow"> = {
   conforme: "green",
@@ -87,6 +88,9 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
             <AssetEventForm assetId={id} />
           </CardContent>
         </Card>
+      </div>
+      <div className="mt-6">
+        <AuditTrailPanel entityType="asset" entityId={id} showRevisions={false} />
       </div>
     </>
   );

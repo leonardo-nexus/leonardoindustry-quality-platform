@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { computeQualityScore, SCORE_LEVEL_TONE } from "@/lib/quality/score";
+import { getT } from "@/lib/i18n/dictionary";
 
 export default async function ExecutivePage() {
   const supabase = await createServerClient();
+  const t = await getT();
   const [
     { data: companies },
     { data: blockedProjects },
@@ -64,10 +66,10 @@ export default async function ExecutivePage() {
   return (
     <>
       <PageHeader
-        title="Vista Direzione"
-        description="Cruscotto sintetico per direzione gruppo — capire in 30 secondi lo stato del sistema qualità"
+        title={t("qs.executive")}
+        description={t("qs.executive_subtitle")}
         actions={
-          <Button asChild variant="outline"><Link href="/quality-sentinel">← Quality Sentinel</Link></Button>
+          <Button asChild variant="outline"><Link href="/quality-sentinel">← {t("qs.title")}</Link></Button>
         }
       />
 

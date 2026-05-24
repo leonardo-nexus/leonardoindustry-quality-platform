@@ -1,6 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { createLocalizedNotification, renderTemplate } from "@/lib/i18n/messages";
 
 type Window = "T-7" | "T-3" | "T-1" | "T" | "T+1" | "T+3" | "T+7";
 
@@ -109,6 +110,8 @@ export async function runQualityEscalationsAction(): Promise<{ ok?: boolean; err
       title: msg,
       message: cfg.escalateToDirection ? `${msg}. Escalation alla direzione.` : msg,
       action_url: `/quality-sentinel/checklists/${c.id}`,
+      template_key: "alert.checklist_overdue",
+      locale: "it",
     });
     await recordEmitted(supabase, "quality_checklist", c.id, w, company_id, project_id, msg);
     created++;
