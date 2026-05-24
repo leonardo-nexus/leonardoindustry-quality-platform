@@ -11,6 +11,7 @@ import { ProjectStartupBanner } from "@/components/quality/loss-prevention-banne
 import { canStartProject } from "@/lib/quality/loss-prevention";
 import { ApproveSheetButton, NewSheetForm } from "./sheet-actions-ui";
 import { ContextualHelp } from "@/components/help/contextual-help";
+import { MobileEvidenceLayer } from "@/components/mobile/mobile-evidence-layer";
 
 const STATUS_VARIANT: Record<string, "yellow" | "orange" | "green" | "red" | "gray"> = {
   da_approvare: "orange", approvata: "green", obsoleta: "gray", contestata: "red", archiviata: "gray",
@@ -95,6 +96,22 @@ export default async function ProjectTechnicalSheetsPage({ params }: { params: P
         </div>
 
         <div className="space-y-4">
+          <Card className="leo-card">
+            <CardHeader>
+              <CardTitle className="text-base">Evidenze mobile schede tecniche</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MobileEvidenceLayer
+                context={{
+                  entity_type: "project",
+                  entity_id: id,
+                  company_id: project.company_id,
+                  evidence_type: "documento_scansionato",
+                }}
+                allowed={["scan_documento", "allegato", "foto"]}
+              />
+            </CardContent>
+          </Card>
           <ContextualHelp topicSlug="schede_tecniche" />
           <Card className="leo-card">
             <CardHeader>

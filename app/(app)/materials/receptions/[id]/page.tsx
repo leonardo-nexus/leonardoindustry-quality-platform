@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 import { ReceptionFlow } from "./reception-flow";
+import { MobileEvidenceLayer } from "@/components/mobile/mobile-evidence-layer";
 
 export default async function ReceptionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -65,6 +66,24 @@ export default async function ReceptionDetailPage({ params }: { params: Promise<
               {rec.destination_matches != null && (
                 <Row label="Destinazione OK" value={rec.destination_matches ? "✓" : <span className="text-status-red">✗</span>} />
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="leo-card">
+            <CardHeader>
+              <CardTitle className="text-base">Evidenze aggiuntive</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MobileEvidenceLayer
+                context={{
+                  entity_type: "material_reception",
+                  entity_id: id,
+                  company_id: rec.company_id,
+                  project_id: rec.project_id,
+                  evidence_type: "foto_materiale",
+                }}
+                allowed={["foto", "scan_documento", "allegato", "firma", "nc"]}
+              />
             </CardContent>
           </Card>
 

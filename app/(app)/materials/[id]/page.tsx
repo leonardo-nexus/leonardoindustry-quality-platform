@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { LossPreventionBanner } from "@/components/quality/loss-prevention-banner";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
+import { MobileEvidenceLayer } from "@/components/mobile/mobile-evidence-layer";
 import { canUseMaterial, blockersToBannerItems } from "@/lib/quality/loss-prevention";
 import { VerifyMaterialButton, RecheckButton } from "../../projects/[id]/materials/material-actions-ui";
 
@@ -115,7 +116,22 @@ export default async function MaterialDetailPage({ params }: { params: Promise<{
           </Card>
         </div>
 
-        <div>
+        <div className="space-y-4">
+          <Card className="leo-card">
+            <CardHeader><CardTitle className="text-base">Evidenze lotto</CardTitle></CardHeader>
+            <CardContent>
+              <MobileEvidenceLayer
+                context={{
+                  entity_type: "material_lot",
+                  entity_id: id,
+                  company_id: lot.company_id,
+                  project_id: lot.project_id,
+                  evidence_type: "foto_etichetta",
+                }}
+                allowed={["foto", "scan_documento", "allegato", "nc"]}
+              />
+            </CardContent>
+          </Card>
           <AuditTrailPanel entityType="material_lot" entityId={id} showRevisions />
         </div>
       </div>

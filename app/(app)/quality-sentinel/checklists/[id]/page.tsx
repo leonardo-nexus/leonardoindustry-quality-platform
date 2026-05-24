@@ -10,6 +10,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
 import { ChecklistItemControl, CompleteButton, SignButton } from "./controls";
 import { ContextualHelp } from "@/components/help/contextual-help";
+import { MobileEvidenceLayer } from "@/components/mobile/mobile-evidence-layer";
 
 export default async function ChecklistDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -120,6 +121,23 @@ export default async function ChecklistDetail({ params }: { params: Promise<{ id
                   <CheckCircle2 className="h-3 w-3" /> Completata il {chk.completed_at ? format(new Date(chk.completed_at), "dd/MM HH:mm") : "—"}
                 </p>
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="leo-card">
+            <CardHeader>
+              <CardTitle className="text-base">Evidenze mobile checklist</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MobileEvidenceLayer
+                context={{
+                  entity_type: "quality_checklist",
+                  entity_id: id,
+                  company_id: (chk as any).phase?.plan?.project?.company?.id ?? null,
+                  evidence_type: "foto_controllo",
+                }}
+                allowed={["foto", "scan_documento", "allegato", "firma", "nc"]}
+              />
             </CardContent>
           </Card>
 

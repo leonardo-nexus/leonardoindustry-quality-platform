@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 import { AuditTrailPanel } from "@/components/audit/audit-trail-panel";
+import { MobileEvidenceLayer } from "@/components/mobile/mobile-evidence-layer";
 
 export default async function InterventionDetailPage({ params }: { params: Promise<{ id: string; interventionId: string }> }) {
   const { id: assetId, interventionId } = await params;
@@ -115,6 +116,24 @@ export default async function InterventionDetailPage({ params }: { params: Promi
               </CardContent>
             </Card>
           )}
+
+          <Card className="leo-card">
+            <CardHeader>
+              <CardTitle className="text-base">Evidenze mobile intervento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MobileEvidenceLayer
+                context={{
+                  entity_type: "asset_intervention",
+                  entity_id: interventionId,
+                  company_id: int.company_id,
+                  project_id: int.project_id,
+                  evidence_type: "foto_controllo",
+                }}
+                allowed={["foto", "scan_documento", "allegato", "firma"]}
+              />
+            </CardContent>
+          </Card>
 
           <AuditTrailPanel entityType="asset_intervention" entityId={interventionId} showRevisions={false} />
         </div>

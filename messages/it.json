@@ -30,7 +30,10 @@
     "audit_log": "Audit log",
     "calendar": "Calendario",
     "interventions": "Interventi",
-    "erp_integration": "Integrazione ERP"
+    "erp_integration": "Integrazione ERP",
+    "evidence": "Evidenze",
+    "ocr": "OCR queue",
+    "suspicious": "Compilazioni sospette"
   },
   "actions": {
     "new": "Nuovo",

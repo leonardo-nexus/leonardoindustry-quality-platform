@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Camera, ScanLine, Paperclip, FileSignature, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadMobileEvidenceAction } from "./actions";
+import { SignaturePad } from "./signature-pad";
 
 export type MobileEvidenceKind =
   | "foto"
@@ -134,13 +135,7 @@ export function MobileEvidenceLayer({ context, allowed = ["foto", "scan_document
         />
       )}
       {allowed.includes("firma") && (
-        <MobileButton
-          icon={<FileSignature className="h-6 w-6" />}
-          label="Firma"
-          onClick={() => toast.info("Firma digitale: prossimo sprint")}
-          pending={false}
-          color="brand-green"
-        />
+        <SignaturePad context={{ entity_type: context.entity_type, entity_id: context.entity_id, company_id: context.company_id, project_id: context.project_id }} />
       )}
       {allowed.includes("nc") && (
         <MobileButton

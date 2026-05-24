@@ -24,7 +24,7 @@ import {
   ShoppingCart,
   FileSignature,
 } from "lucide-react";
-import { HelpCircle, UserCheck, Truck, History, Calendar as CalendarIcon, ArrowLeftRight } from "lucide-react";
+import { HelpCircle, UserCheck, Truck, History, Calendar as CalendarIcon, ArrowLeftRight, Camera, ScanLine, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LeonardoLogo } from "./logo";
 import { useT } from "@/lib/i18n/client";
@@ -40,6 +40,9 @@ const NAV: { href: string; key: string; icon: any; roles: string | string[] }[] 
   { href: "/dashboard",          key: "nav.dashboard",        icon: LayoutDashboard,  roles: ["responsabile_qualita","responsabile_commessa","direzione_impresa","direzione_gruppo","responsabile_sicurezza","responsabile_ambiente","responsabile_saldatura","auditor","capo_cantiere","capo_officina"] },
   { href: "/quality-sentinel",   key: "nav.quality_sentinel", icon: Shield,           roles: ["responsabile_qualita","responsabile_commessa","direzione_impresa","direzione_gruppo","auditor","revisore","responsabile_saldatura","capo_cantiere","capo_officina"] },
   { href: "/quality-sentinel/risk", key: "nav.risk",          icon: ShieldAlert,      roles: ["responsabile_qualita","direzione_impresa","direzione_gruppo"] },
+  { href: "/quality-sentinel/suspicious", key: "nav.suspicious", icon: EyeOff,          roles: ["responsabile_qualita","auditor","direzione_impresa","direzione_gruppo"] },
+  { href: "/evidence",           key: "nav.evidence",         icon: Camera,           roles: ["responsabile_qualita","auditor","direzione_impresa","direzione_gruppo","responsabile_commessa","capo_cantiere","capo_officina"] },
+  { href: "/ocr",                key: "nav.ocr",              icon: ScanLine,         roles: ["responsabile_qualita","direzione_impresa","direzione_gruppo","magazzino"] },
   { href: "/material-requests",  key: "nav.material_requests", icon: ClipboardList,   roles: ["magazzino","responsabile_commessa","responsabile_qualita","direzione_impresa","capo_cantiere","capo_officina"] },
   { href: "/material-orders",    key: "nav.material_orders",  icon: ShoppingCart,     roles: ["magazzino","responsabile_commessa","responsabile_qualita","direzione_impresa"] },
   { href: "/materials",          key: "nav.materials",        icon: Package,          roles: ["magazzino","responsabile_commessa","responsabile_qualita","direzione_impresa","capo_cantiere","capo_officina","responsabile_saldatura"] },

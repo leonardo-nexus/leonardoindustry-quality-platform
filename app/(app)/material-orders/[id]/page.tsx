@@ -13,6 +13,7 @@ import { canSupplierProduce, canSupplierDeliver, canReceiveMaterial } from "@/li
 import { blockersToBannerItems } from "@/lib/quality/loss-prevention";
 import { OrderActions } from "./order-actions";
 import { OrderEditPanel } from "./order-edit-panel";
+import { MobileEvidenceLayer } from "@/components/mobile/mobile-evidence-layer";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -133,7 +134,24 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </Card>
         </div>
 
-        <AuditTrailPanel entityType="material_order" entityId={id} showRevisions={false} />
+        <div className="space-y-4">
+          <Card className="leo-card">
+            <CardHeader><CardTitle className="text-base">Evidenze ordine</CardTitle></CardHeader>
+            <CardContent>
+              <MobileEvidenceLayer
+                context={{
+                  entity_type: "material_order",
+                  entity_id: id,
+                  company_id: order.company_id,
+                  project_id: order.project_id,
+                  evidence_type: "documento_scansionato",
+                }}
+                allowed={["scan_documento", "allegato", "foto"]}
+              />
+            </CardContent>
+          </Card>
+          <AuditTrailPanel entityType="material_order" entityId={id} showRevisions={false} />
+        </div>
       </div>
     </>
   );
