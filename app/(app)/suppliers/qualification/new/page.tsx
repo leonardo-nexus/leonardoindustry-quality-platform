@@ -14,9 +14,9 @@ export default async function NewQualificationPage({ searchParams }: { searchPar
   return (
     <>
       <PageHeader
-        title="Nuova qualifica fornitore · FMT-FOR-01"
-        description={sp.erp_supplier_id ? `Pre-popolata da ERP supplier ${sp.erp_supplier_id}` : "Compila anagrafica + 13 sezioni"}
-        actions={<Button asChild variant="outline"><Link href="/suppliers/qualification">← Lista</Link></Button>}
+        title="Aggiungi fornitore"
+        description={sp.erp_supplier_id ? `Pre-popolata da ERP supplier ${sp.erp_supplier_id}` : "Crea anagrafica e apri la scheda di qualifica"}
+        actions={<Button asChild variant="outline"><Link href="/suppliers/qualification">Lista qualifiche</Link></Button>}
       />
       <Card className="leo-card max-w-3xl">
         <CardContent className="p-6">

@@ -66,7 +66,7 @@ export default async function SuppliersQualificationPage({ searchParams }: { sea
                 </Button>
               </>
             )}
-            <Button asChild><Link href="/suppliers/qualification/new"><Plus className="mr-1 h-3 w-3" /> Nuova qualifica</Link></Button>
+            <Button asChild><Link href="/suppliers/qualification/new"><Plus className="mr-1 h-3 w-3" /> Aggiungi fornitore</Link></Button>
             <Button asChild variant="outline"><Link href="/suppliers">← Fornitori</Link></Button>
           </div>
         }

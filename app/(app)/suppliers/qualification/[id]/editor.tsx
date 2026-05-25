@@ -2,49 +2,110 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Save, CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { updateQualificationAction, approveQualificationAction } from "../actions";
 
 const TABS = [
-  "legale", "certificazioni", "qualita", "sicurezza", "ambiente", "capacita", "affidabilita", "produzione",
+  "economica",
+  "infrastruttura",
+  "qualita",
+  "personale",
+  "sedi",
+  "sostenibilita",
+  "affidabilita",
+  "produzione",
 ] as const;
 
 type Tab = typeof TABS[number];
 
-const FIELDS: Record<Tab, { name: string; label: string; type?: string; critical?: boolean }[]> = {
-  legale: [
-    { name: "cciaa_valid", label: "CCIAA/Visura valida", type: "checkbox", critical: true },
-    { name: "durc_valid", label: "DURC valido", type: "checkbox", critical: true },
-    { name: "rct_rco_valid", label: "RCT/RCO valida", type: "checkbox", critical: true },
-    { name: "antimafia_required", label: "Richiede antimafia", type: "checkbox" },
-    { name: "antimafia_valid", label: "Antimafia valida", type: "checkbox" },
-    { name: "fiscale_ok", label: "Documenti fiscali OK", type: "checkbox", critical: true },
+type Field = {
+  name: string;
+  label: string;
+  type?: "text" | "number" | "checkbox";
+  critical?: boolean;
+};
+
+type QualificationEditorRecord = {
+  id: string;
+  legal_compliance?: Record<string, unknown> | null;
+  certifications?: Record<string, unknown> | null;
+  quality_data?: Record<string, unknown> | null;
+  safety_data?: Record<string, unknown> | null;
+  environment_data?: Record<string, unknown> | null;
+  capacity_data?: Record<string, unknown> | null;
+  reliability_data?: Record<string, unknown> | null;
+  production_delivery?: Record<string, unknown> | null;
+};
+
+type EditorData = Record<string, Record<string, unknown>>;
+
+const TAB_LABEL: Record<Tab, string> = {
+  economica: "Fatturato",
+  infrastruttura: "Infrastruttura",
+  qualita: "Qualita",
+  personale: "Personale",
+  sedi: "Sedi",
+  sostenibilita: "Compliance",
+  affidabilita: "Affidabilita",
+  produzione: "Gate operativi",
+};
+
+const FIELDS: Record<Tab, Field[]> = {
+  economica: [
+    { name: "fatturato_annuo", label: "Fatturato annuo EUR", type: "number", critical: true },
+    { name: "fatturato_2021", label: "Fatturato 2021 EUR", type: "number" },
+    { name: "fatturato_2022", label: "Fatturato 2022 EUR", type: "number" },
+    { name: "fatturato_2023", label: "Fatturato 2023 EUR", type: "number" },
+    { name: "fatturato_2024", label: "Fatturato 2024 EUR", type: "number" },
+    { name: "cagr_2021_2024", label: "CAGR 2021-2024 %", type: "number" },
+    { name: "anni_attivita", label: "Anni di attivita", type: "number" },
+    { name: "bilancio_verificato", label: "Bilancio verificato", type: "checkbox", critical: true },
+    { name: "fiscale_ok", label: "Conformita fiscale OK", type: "checkbox", critical: true },
+    { name: "rct_rco_valid", label: "RCT/RCO valida", type: "checkbox" },
+    { name: "assicurazione_credito", label: "Assicurazione credito", type: "checkbox" },
   ],
-  certificazioni: [
-    { name: "iso_9001", label: "ISO 9001 attiva", type: "checkbox" },
-    { name: "iso_14001", label: "ISO 14001 attiva", type: "checkbox" },
-    { name: "iso_45001", label: "ISO 45001 attiva", type: "checkbox" },
-    { name: "marcatura_ce", label: "Marcatura CE", type: "checkbox" },
-    { name: "cert_saldatura_1090", label: "UNE-EN 1090", type: "checkbox" },
+  infrastruttura: [
+    { name: "sedi_operative", label: "Sedi operative", type: "number" },
+    { name: "stabilimenti", label: "Stabilimenti", type: "number" },
+    { name: "macchinari_critici", label: "Macchinari critici disponibili", type: "checkbox", critical: true },
+    { name: "capacita_produttiva", label: "Capacita produttiva adeguata", type: "checkbox", critical: true },
+    { name: "magazzino_controllato", label: "Magazzino controllato", type: "checkbox" },
+    { name: "piano_continuita", label: "Piano continuita operativa", type: "checkbox" },
   ],
   qualita: [
-    { name: "quality_system", label: "Sistema qualità", type: "text" },
-    { name: "quality_responsible", label: "Responsabile qualità", type: "text" },
+    { name: "quality_system", label: "Sistema qualita documentato", type: "checkbox", critical: true },
+    { name: "quality_responsible", label: "Responsabile qualita nominato", type: "checkbox", critical: true },
+    { name: "iso_9001", label: "ISO 9001 attiva", type: "checkbox", critical: true },
+    { name: "marcatura_ce", label: "Marcatura CE", type: "checkbox" },
+    { name: "cert_saldatura_1090", label: "UNE-EN 1090 / saldatura", type: "checkbox" },
   ],
-  sicurezza: [
-    { name: "infortuni_3y", label: "Infortuni ultimi 3 anni", type: "number" },
-    { name: "formazione_aggiornata", label: "Formazione aggiornata", type: "checkbox" },
-  ],
-  ambiente: [
-    { name: "smaltimento_certificato", label: "Smaltimento certificato", type: "checkbox" },
-  ],
-  capacita: [
-    { name: "anni_attivita", label: "Anni di attività", type: "number" },
+  personale: [
     { name: "dipendenti", label: "Dipendenti", type: "number" },
-    { name: "fatturato_annuo", label: "Fatturato annuo €", type: "number" },
+    { name: "operatori_qualificati", label: "Operatori qualificati", type: "number" },
+    { name: "saldatori_qualificati", label: "Saldatori qualificati", type: "number" },
+    { name: "responsabile_tecnico", label: "Responsabile tecnico", type: "checkbox", critical: true },
+    { name: "formazione_aggiornata", label: "Formazione aggiornata", type: "checkbox", critical: true },
+    { name: "turni_copertura", label: "Copertura turni garantita", type: "checkbox" },
+  ],
+  sedi: [
+    { name: "sede_legale", label: "Sede legale verificata", type: "checkbox", critical: true },
+    { name: "sedi_operative", label: "Sedi operative", type: "number" },
+    { name: "stabilimenti", label: "Stabilimenti", type: "number" },
+    { name: "paesi_serviti", label: "Paesi serviti", type: "number" },
+    { name: "copertura_locale", label: "Copertura locale cantieri", type: "checkbox" },
+    { name: "logistica_tracciata", label: "Logistica tracciata", type: "checkbox" },
+  ],
+  sostenibilita: [
+    { name: "iso_14001", label: "ISO 14001 attiva", type: "checkbox" },
+    { name: "iso_45001", label: "ISO 45001 attiva", type: "checkbox", critical: true },
+    { name: "smaltimento_certificato", label: "Smaltimento certificato", type: "checkbox" },
+    { name: "rating_esg", label: "Rating / report ESG", type: "checkbox" },
+    { name: "codice_etico", label: "Codice etico adottato", type: "checkbox" },
+    { name: "privacy_gdpr", label: "Privacy GDPR conforme", type: "checkbox", critical: true },
+    { name: "durc_valid", label: "DURC valido", type: "checkbox", critical: true },
   ],
   affidabilita: [
     { name: "ordini_totali", label: "Ordini totali", type: "number" },
@@ -54,7 +115,7 @@ const FIELDS: Record<Tab, { name: string; label: string; type?: string; critical
     { name: "nc_aperte", label: "NC aperte", type: "number" },
     { name: "deroghe_firmate", label: "Deroghe firmate", type: "number" },
     { name: "consegne_non_autorizzate", label: "Consegne non autorizzate", type: "number" },
-    { name: "danni_economici_euro", label: "Danni economici €", type: "number" },
+    { name: "danni_economici_euro", label: "Danni economici EUR", type: "number" },
   ],
   produzione: [
     { name: "produzione_richiede_autorizzazione", label: "Produzione richiede autorizzazione", type: "checkbox", critical: true },
@@ -65,21 +126,42 @@ const FIELDS: Record<Tab, { name: string; label: string; type?: string; critical
 };
 
 const TAB_TO_JSON_KEY: Record<Tab, string> = {
-  legale: "legal_compliance",
-  certificazioni: "certifications",
+  economica: "capacity_data",
+  infrastruttura: "capacity_data",
   qualita: "quality_data",
-  sicurezza: "safety_data",
-  ambiente: "environment_data",
-  capacita: "capacity_data",
+  personale: "capacity_data",
+  sedi: "capacity_data",
+  sostenibilita: "environment_data",
   affidabilita: "reliability_data",
   produzione: "production_delivery",
 };
 
-export function QualificationEditor({ qualification }: { qualification: any }) {
+const MIRROR_TO_JSON_KEY: Partial<Record<Tab, Record<string, string>>> = {
+  economica: {
+    bilancio_verificato: "capacity_data",
+    fiscale_ok: "legal_compliance",
+    rct_rco_valid: "legal_compliance",
+  },
+  qualita: {
+    iso_9001: "certifications",
+    marcatura_ce: "certifications",
+    cert_saldatura_1090: "certifications",
+  },
+  personale: {
+    formazione_aggiornata: "safety_data",
+  },
+  sostenibilita: {
+    iso_14001: "certifications",
+    iso_45001: "certifications",
+    durc_valid: "legal_compliance",
+  },
+};
+
+export function QualificationEditor({ qualification }: { qualification: QualificationEditorRecord }) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<Tab>("legale");
+  const [activeTab, setActiveTab] = useState<Tab>("economica");
   const [pending, startTransition] = useTransition();
-  const [data, setData] = useState<Record<string, any>>({
+  const [data, setData] = useState<EditorData>({
     legal_compliance: qualification.legal_compliance ?? {},
     certifications: qualification.certifications ?? {},
     quality_data: qualification.quality_data ?? {},
@@ -90,29 +172,37 @@ export function QualificationEditor({ qualification }: { qualification: any }) {
     production_delivery: qualification.production_delivery ?? {},
   });
 
-  function set(tab: Tab, name: string, value: any) {
-    const key = TAB_TO_JSON_KEY[tab];
-    setData({ ...data, [key]: { ...data[key], [name]: value } });
+  function set(tab: Tab, name: string, value: unknown) {
+    const primaryKey = TAB_TO_JSON_KEY[tab];
+    const mirrorKey = MIRROR_TO_JSON_KEY[tab]?.[name];
+    setData((current) => ({
+      ...current,
+      [primaryKey]: { ...current[primaryKey], [name]: value },
+      ...(mirrorKey ? { [mirrorKey]: { ...current[mirrorKey], [name]: value } } : {}),
+    }));
   }
 
   function save() {
     startTransition(async () => {
-      const r = await updateQualificationAction(qualification.id, data);
-      if (r?.error) toast.error(r.error);
+      const result = await updateQualificationAction(qualification.id, data);
+      if (result?.error) toast.error(result.error);
       else {
-        toast.success(`Score aggiornato a ${r.score}/100 · ${r.level}${r.blocked_for_orders ? " · BLOCCATO" : ""} · sync_outbox in pending`);
+        toast.success(`Score aggiornato a ${result.score}/100 - ${result.level}${result.blocked_for_orders ? " - BLOCCATO" : ""}`);
         router.refresh();
       }
     });
   }
 
   function approve() {
-    const reason = prompt("Motivo approvazione (obbligatorio):");
-    if (!reason || reason.length < 3) return;
+    const reason = prompt("Motivo approvazione");
+    if (!reason || reason.trim().length < 3) return;
     startTransition(async () => {
-      const r = await approveQualificationAction(qualification.id, reason);
-      if (r?.error) toast.error(r.error);
-      else { toast.success("Qualifica approvata"); router.refresh(); }
+      const result = await approveQualificationAction(qualification.id, reason);
+      if (result?.error) toast.error(result.error);
+      else {
+        toast.success("Qualifica approvata");
+        router.refresh();
+      }
     });
   }
 
@@ -122,58 +212,64 @@ export function QualificationEditor({ qualification }: { qualification: any }) {
   return (
     <Card className="leo-card">
       <CardHeader>
-        <CardTitle className="text-base">Sezioni qualifica (8 tabs)</CardTitle>
+        <CardTitle className="text-base">Scheda valutazione requisiti</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Tabs */}
         <div className="mb-4 flex flex-wrap gap-1 border-b border-leo-border">
-          {TABS.map((t) => (
+          {TABS.map((tab) => (
             <button
-              key={t}
+              key={tab}
               type="button"
-              onClick={() => setActiveTab(t)}
-              className={`px-3 py-1.5 text-xs font-medium border-b-2 -mb-px ${activeTab === t ? "border-brand-cyan text-brand-cyan" : "border-transparent text-leo-muted hover:text-leo-text"}`}
+              onClick={() => setActiveTab(tab)}
+              className={`-mb-px border-b-2 px-3 py-1.5 text-xs font-medium ${
+                activeTab === tab ? "border-brand-cyan text-brand-cyan" : "border-transparent text-leo-muted hover:text-leo-text"
+              }`}
             >
-              {t}
+              {TAB_LABEL[tab]}
             </button>
           ))}
         </div>
 
-        {/* Fields */}
-        <div className="grid gap-3 sm:grid-cols-2">
-          {tabFields.map((f) => (
-            <label key={f.name} className="flex items-center gap-2 text-sm">
-              {f.type === "checkbox" ? (
-                <>
-                  <input
-                    type="checkbox"
-                    checked={!!tabData[f.name]}
-                    onChange={(e) => set(activeTab, f.name, e.target.checked)}
-                  />
-                  <span>{f.label}{f.critical && <span className="text-status-red ml-1">*</span>}</span>
-                </>
-              ) : (
-                <span className="block w-full">
-                  <span className="block text-xs text-leo-muted mb-1">{f.label}{f.critical && <span className="text-status-red ml-1">*</span>}</span>
-                  <Input
-                    type={f.type === "number" ? "number" : "text"}
-                    value={tabData[f.name] ?? ""}
-                    onChange={(e) => set(activeTab, f.name, f.type === "number" ? Number(e.target.value) : e.target.value)}
-                  />
-                </span>
-              )}
-            </label>
-          ))}
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {tabFields.map((field) => {
+            const mirrorKey = MIRROR_TO_JSON_KEY[activeTab]?.[field.name];
+            const value = mirrorKey ? (data[mirrorKey]?.[field.name] ?? tabData[field.name] ?? "") : (tabData[field.name] ?? "");
+            const inputValue = typeof value === "string" || typeof value === "number" ? value : "";
+            return (
+              <label key={field.name} className="flex items-center gap-2 text-sm">
+                {field.type === "checkbox" ? (
+                  <>
+                    <input
+                      type="checkbox"
+                      checked={!!value}
+                      onChange={(event) => set(activeTab, field.name, event.target.checked)}
+                      className="h-4 w-4 rounded border-leo-border accent-brand-cyan"
+                    />
+                    <span>{field.label}{field.critical && <span className="ml-1 text-status-red">*</span>}</span>
+                  </>
+                ) : (
+                  <span className="block w-full">
+                    <span className="mb-1 block text-xs text-leo-muted">{field.label}{field.critical && <span className="ml-1 text-status-red">*</span>}</span>
+                    <Input
+                      type={field.type === "number" ? "number" : "text"}
+                      value={inputValue}
+                      onChange={(event) => set(activeTab, field.name, field.type === "number" ? Number(event.target.value) : event.target.value)}
+                    />
+                  </span>
+                )}
+              </label>
+            );
+          })}
         </div>
 
-        {/* Footer actions */}
         <div className="mt-4 flex flex-wrap gap-2 border-t border-leo-border pt-3">
           <Button onClick={save} disabled={pending} className="mobile-action">
-            {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Salva sezione + ricalcola score
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Salva e ricalcola score
           </Button>
           <Button onClick={approve} disabled={pending} variant="outline" className="mobile-action border-status-green/40 text-status-green">
-            <CheckCircle2 className="mr-2 h-4 w-4" /> Approva qualifica
+            <CheckCircle2 className="h-4 w-4" />
+            Approva qualifica
           </Button>
         </div>
       </CardContent>

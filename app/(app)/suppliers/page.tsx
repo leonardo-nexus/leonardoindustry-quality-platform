@@ -1,13 +1,44 @@
 import Link from "next/link";
 import { format } from "date-fns";
-import { Truck, TrendingDown, AlertOctagon } from "lucide-react";
+import { AlertOctagon, ClipboardCheck, Plus, ShieldCheck, Truck, TrendingDown, type LucideIcon } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { createServerClient } from "@/lib/supabase/server";
 
 const LEVEL_VARIANT: Record<string, "green" | "blue" | "yellow" | "orange" | "red"> = {
-  eccellente: "green", affidabile: "blue", attenzione: "yellow", critico: "orange", inaffidabile: "red",
+  eccellente: "green",
+  affidabile: "blue",
+  attenzione: "yellow",
+  critico: "orange",
+  inaffidabile: "red",
+};
+
+type SupplierScoreRow = {
+  id: string;
+  supplier_name: string;
+  score: number;
+  level: string;
+  unauthorized_production_count: number;
+  unauthorized_delivery_count: number;
+  forced_delivery_count: number;
+  damage_count: number;
+  nc_open_count: number;
+  total_estimated_loss: number;
+  last_event_at: string | null;
+  company?: { name: string | null } | null;
+};
+
+type QualificationRow = {
+  id: string;
+  legal_name: string;
+  supplier_name: string;
+  qualification_status: string | null;
+  score: number | null;
+  blocked_for_orders: boolean | null;
+  valid_until: string | null;
+  country: string | null;
 };
 
 export default async function SuppliersPage() {
@@ -16,69 +47,148 @@ export default async function SuppliersPage() {
     .from("supplier_score")
     .select("*, company:company_id(name)")
     .order("score", { ascending: true });
+  const { data: qualifications } = await supabase
+    .from("supplier_qualification")
+    .select("id, legal_name, supplier_name, qualification_status, score, blocked_for_orders, valid_until, country")
+    .is("deleted_at", null)
+    .order("score", { ascending: true });
 
-  const totalLoss = (scores ?? []).reduce((s, x: any) => s + (Number(x.total_estimated_loss) ?? 0), 0);
-  const critici = (scores ?? []).filter((s: any) => ["critico", "inaffidabile"].includes(s.level)).length;
+  const scoreRows = (scores ?? []) as SupplierScoreRow[];
+  const qualificationRows = (qualifications ?? []) as QualificationRow[];
+  const totalLoss = scoreRows.reduce((sum, score) => sum + (Number(score.total_estimated_loss) || 0), 0);
+  const critici = scoreRows.filter((score) => ["critico", "inaffidabile"].includes(score.level)).length;
+  const qualificati = qualificationRows.filter((qualification) => ["qualified_excellent", "qualified"].includes(qualification.qualification_status ?? "")).length;
+  const bloccati = qualificationRows.filter((qualification) => qualification.blocked_for_orders).length;
 
   return (
     <>
       <PageHeader
         title="Fornitori"
-        description="Punteggio fornitore + penalità + danni stimati. Eventi auto-aggiornati da gate e NC."
+        description="Punteggio fornitore + qualifica + penalita + danni stimati. Eventi auto-aggiornati da gate e NC."
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href="/suppliers/qualification/new">
+                <Plus className="h-4 w-4" />
+                Aggiungi fornitore
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/suppliers/qualification">
+                <ClipboardCheck className="h-4 w-4" />
+                Cruscotto qualifiche
+              </Link>
+            </Button>
+          </div>
+        }
       />
 
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Card className="leo-card border-status-red/40">
-          <CardContent className="p-4 text-center">
-            <TrendingDown className="mx-auto mb-1 h-5 w-5 text-status-red" />
-            <div className="text-2xl font-bold text-status-red">{totalLoss.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}</div>
-            <div className="text-xs text-leo-muted">Danno totale stimato</div>
-          </CardContent>
-        </Card>
-        <Card className="leo-card border-status-orange/40">
-          <CardContent className="p-4 text-center">
-            <AlertOctagon className="mx-auto mb-1 h-5 w-5 text-status-orange" />
-            <div className="text-2xl font-bold">{critici}</div>
-            <div className="text-xs text-leo-muted">Fornitori critici/inaffidabili</div>
-          </CardContent>
-        </Card>
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <KpiCard
+          icon={TrendingDown}
+          value={totalLoss.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
+          label="Danno totale stimato"
+          color="text-status-red"
+          border="border-status-red/40"
+        />
+        <KpiCard icon={AlertOctagon} value={critici} label="Fornitori critici" color="text-status-orange" border="border-status-orange/40" />
+        <KpiCard icon={Truck} value={scoreRows.length} label="Fornitori tracciati" color="text-brand-cyan" />
+        <KpiCard icon={ShieldCheck} value={qualificati} label="Qualificati" color="text-status-green" border="border-status-green/40" />
+        <KpiCard icon={AlertOctagon} value={bloccati} label="Bloccati ordini" color="text-status-red" border="border-status-red/40" />
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <Card className="leo-card">
-          <CardContent className="p-4 text-center">
-            <Truck className="mx-auto mb-1 h-5 w-5 text-brand-cyan" />
-            <div className="text-2xl font-bold">{scores?.length ?? 0}</div>
-            <div className="text-xs text-leo-muted">Fornitori tracciati</div>
+          <CardHeader>
+            <CardTitle className="text-base">Qualifiche fornitore</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {qualificationRows.map((qualification) => (
+              <Link
+                key={qualification.id}
+                href={`/suppliers/qualification/${qualification.id}`}
+                className="flex items-center justify-between rounded-md border border-leo-border bg-leo-card/40 px-3 py-2 text-sm hover:border-brand-cyan hover:bg-leo-card"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium">{qualification.legal_name}</div>
+                  <div className="text-xs text-leo-muted">
+                    {qualification.country ?? "-"}
+                    {qualification.valid_until && <> - valida fino al {format(new Date(qualification.valid_until), "dd/MM/yyyy")}</>}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Badge variant={qualification.blocked_for_orders ? "red" : ["qualified_excellent", "qualified"].includes(qualification.qualification_status ?? "") ? "green" : "yellow"}>
+                    {qualification.blocked_for_orders ? "bloccato" : qualification.qualification_status?.replace(/_/g, " ") ?? "in attesa"}
+                  </Badge>
+                  <div className="font-mono text-lg font-bold">{qualification.score ?? 0}<span className="text-xs text-leo-muted">/100</span></div>
+                </div>
+              </Link>
+            ))}
+            {qualificationRows.length === 0 && (
+              <p className="py-8 text-center text-sm text-leo-muted">
+                Nessuna qualifica registrata. <Link href="/suppliers/qualification/new" className="text-brand-cyan underline">Crea la prima</Link>
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="leo-card">
+          <CardHeader>
+            <CardTitle className="text-base">Punteggio fornitori (peggiori in alto)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {scoreRows.map((score) => (
+              <Link
+                key={score.id}
+                href={`/suppliers/${encodeURIComponent(score.supplier_name)}`}
+                className="flex items-center justify-between rounded-md border border-leo-border bg-leo-card/40 px-3 py-2 text-sm hover:border-brand-cyan hover:bg-leo-card"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium">{score.supplier_name}</div>
+                  <div className="text-xs text-leo-muted">
+                    {score.company?.name ?? "-"}
+                    - {score.unauthorized_production_count}+{score.unauthorized_delivery_count}+{score.forced_delivery_count} forzature
+                    - {score.damage_count} danni - {score.nc_open_count} NC aperte
+                    {score.total_estimated_loss > 0 && <> - perdita {Number(score.total_estimated_loss).toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}</>}
+                    {score.last_event_at && <> - ultimo evento {format(new Date(score.last_event_at), "dd/MM/yyyy")}</>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={LEVEL_VARIANT[score.level] ?? "outline"}>{score.level}</Badge>
+                  <div className="font-mono text-lg font-bold">{score.score}<span className="text-xs text-leo-muted">/100</span></div>
+                </div>
+              </Link>
+            ))}
+            {scoreRows.length === 0 && (
+              <p className="py-8 text-center text-sm text-leo-muted">Nessun fornitore tracciato ancora</p>
+            )}
           </CardContent>
         </Card>
       </div>
-
-      <Card className="leo-card">
-        <CardHeader>
-          <CardTitle className="text-base">Punteggio fornitori (peggiori in alto)</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-1">
-          {(scores ?? []).map((s: any) => (
-            <Link key={s.id} href={`/suppliers/${encodeURIComponent(s.supplier_name)}`} className="flex items-center justify-between rounded-md border border-leo-border bg-leo-card/40 px-3 py-2 text-sm hover:bg-leo-card hover:border-brand-cyan">
-              <div className="flex-1 min-w-0">
-                <div className="font-medium">{s.supplier_name}</div>
-                <div className="text-xs text-leo-muted">
-                  {s.company?.name ?? "—"}
-                  · {s.unauthorized_production_count}+{s.unauthorized_delivery_count}+{s.forced_delivery_count} forzature
-                  · {s.damage_count} danni · {s.nc_open_count} NC aperte
-                  {s.total_estimated_loss > 0 && <> · perdita {Number(s.total_estimated_loss).toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}</>}
-                  {s.last_event_at && <> · ultimo evento {format(new Date(s.last_event_at), "dd/MM/yyyy")}</>}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={LEVEL_VARIANT[s.level] ?? "outline"}>{s.level}</Badge>
-                <div className="font-mono font-bold text-lg">{s.score}<span className="text-xs text-leo-muted">/100</span></div>
-              </div>
-            </Link>
-          ))}
-          {(scores?.length ?? 0) === 0 && (
-            <p className="text-center text-sm text-leo-muted py-8">Nessun fornitore tracciato ancora</p>
-          )}
-        </CardContent>
-      </Card>
     </>
+  );
+}
+
+function KpiCard({
+  icon: Icon,
+  value,
+  label,
+  color,
+  border = "border-leo-border",
+}: {
+  icon: LucideIcon;
+  value: string | number;
+  label: string;
+  color: string;
+  border?: string;
+}) {
+  return (
+    <Card className={`leo-card ${border}`}>
+      <CardContent className="p-4 text-center">
+        <Icon className={`mx-auto mb-1 h-5 w-5 ${color}`} />
+        <div className={`text-2xl font-bold ${color}`}>{value}</div>
+        <div className="text-xs text-leo-muted">{label}</div>
+      </CardContent>
+    </Card>
   );
 }
