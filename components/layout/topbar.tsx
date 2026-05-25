@@ -27,12 +27,18 @@ export function Topbar({
   companyLogoUrl?: string | null;
   roleCode: AppRole | null;
 }) {
-  const erpBaseUrl = (
+  const configuredErpUrl = (
     process.env.NEXT_PUBLIC_ERP_URL ??
     process.env.ERP_RETURN_URL ??
     "https://leonardo-erp-control-center.vercel.app"
-  ).replace(/\/$/, "");
-  const erpDashboardUrl = `${erpBaseUrl}/dashboard`;
+  );
+  const erpDashboardUrl = (() => {
+    try {
+      return `${new URL(configuredErpUrl).origin}/dashboard`;
+    } catch {
+      return "https://leonardo-erp-control-center.vercel.app/dashboard";
+    }
+  })();
 
   async function handleSignOut() {
     "use server";
