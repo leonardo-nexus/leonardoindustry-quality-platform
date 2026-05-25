@@ -23,6 +23,8 @@ import {
   Package,
   ShoppingCart,
   FileSignature,
+  Handshake,
+  type LucideIcon,
 } from "lucide-react";
 import { HelpCircle, UserCheck, Truck, History, Calendar as CalendarIcon, ArrowLeftRight, Camera, ScanLine, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,7 +37,7 @@ const ALL_ROLES = "*"; // marker per "tutti i ruoli"
  * roles = ruoli che possono VEDERE la voce. admin_gruppo e direzione_gruppo vedono sempre tutto.
  * fornitore + cliente_dl hanno layout/portale separato → escluse di default da sidebar interna.
  */
-const NAV: { href: string; key: string; icon: any; roles: string | string[] }[] = [
+const NAV: { href: string; key: string; icon: LucideIcon; roles: string | string[] }[] = [
   { href: "/my-work",            key: "nav.my_work",          icon: UserCheck,        roles: ALL_ROLES },
   { href: "/dashboard",          key: "nav.dashboard",        icon: LayoutDashboard,  roles: ["responsabile_qualita","responsabile_commessa","direzione_impresa","direzione_gruppo","responsabile_sicurezza","responsabile_ambiente","responsabile_saldatura","auditor","capo_cantiere","capo_officina"] },
   { href: "/quality-sentinel",   key: "nav.quality_sentinel", icon: Shield,           roles: ["responsabile_qualita","responsabile_commessa","direzione_impresa","direzione_gruppo","auditor","revisore","responsabile_saldatura","capo_cantiere","capo_officina"] },
@@ -48,6 +50,7 @@ const NAV: { href: string; key: string; icon: any; roles: string | string[] }[] 
   { href: "/materials",          key: "nav.materials",        icon: Package,          roles: ["magazzino","responsabile_commessa","responsabile_qualita","direzione_impresa","capo_cantiere","capo_officina","responsabile_saldatura"] },
   { href: "/materials/receptions", key: "nav.receptions",     icon: Package,          roles: ["magazzino","operatore","capo_cantiere","capo_officina","responsabile_commessa","responsabile_qualita"] },
   { href: "/suppliers",          key: "nav.suppliers",        icon: Truck,            roles: ["responsabile_qualita","direzione_impresa","direzione_gruppo","responsabile_commessa"] },
+  { href: "/customers",          key: "nav.customers",        icon: Handshake,        roles: ["responsabile_qualita","direzione_impresa","direzione_gruppo","responsabile_commessa"] },
   { href: "/notifications",      key: "nav.notifications",    icon: Bell,             roles: ALL_ROLES },
   { href: "/companies",          key: "nav.companies",        icon: Building2,        roles: ["direzione_impresa","direzione_gruppo"] },
   { href: "/processes",          key: "nav.processes",        icon: Workflow,         roles: ["responsabile_qualita","responsabile_sicurezza","responsabile_ambiente","direzione_impresa","direzione_gruppo","auditor"] },
@@ -122,7 +125,7 @@ export function Sidebar({ roleCode }: { roleCode?: string | null }) {
   );
 }
 
-function NavLink({ href, label, Icon, active }: { href: string; label: string; Icon: any; active: boolean }) {
+function NavLink({ href, label, Icon, active }: { href: string; label: string; Icon: LucideIcon; active: boolean }) {
   return (
     <Link
       href={href}
