@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 type SsoPayload = {
   global_person_id?: string;
@@ -121,16 +121,25 @@ export async function GET(request: NextRequest) {
       await admin.from("person").update({ auth_user_id: authUserId }).eq("id", person.id);
     }
 
-    const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(returnTo)}`;
     const { data: link, error: linkError } = await admin.auth.admin.generateLink({
       type: "magiclink",
       email,
-      options: { redirectTo },
     });
-    const actionLink = link?.properties?.action_link;
-    if (linkError || !actionLink) throw new Error(linkError?.message ?? "Creazione sessione SSO fallita");
+    const tokenHash = link?.properties?.hashed_token;
+    if (linkError || !tokenHash) throw new Error(linkError?.message ?? "Creazione sessione SSO fallita");
 
-    return NextResponse.redirect(actionLink);
+    // Verifica il magic link lato server: evita di dipendere dalla Site URL Supabase,
+    // che in alcuni ambienti puo puntare ancora a localhost.
+    const supabase = await createServerClient();
+    const { data: verified, error: verifyError } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: "magiclink",
+    });
+    if (verifyError || !verified.session) {
+      throw new Error(verifyError?.message ?? "Sessione SSO Quality non creata");
+    }
+
+    return NextResponse.redirect(`${origin}${returnTo}`);
   } catch (error) {
     return NextResponse.redirect(`${origin}/login?local=1&error=${encodeURIComponent((error as Error).message)}`);
   }
