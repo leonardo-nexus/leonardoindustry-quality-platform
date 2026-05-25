@@ -1,29 +1,14 @@
-import Link from "next/link";
-import { PageHeader } from "@/components/layout/page-header";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { createServerClient } from "@/lib/supabase/server";
-import { NewUserForm } from "./new-user-form";
+import { redirect } from "next/navigation";
 
-export default async function NewUserPage() {
-  const supabase = await createServerClient();
-  const [{ data: companies }, { data: roles }] = await Promise.all([
-    supabase.from("company").select("id, name").eq("active", true).order("name"),
-    supabase.from("role").select("code, name, role_level").eq("active", true).order("role_level", { ascending: false }),
-  ]);
+function erpIdentityNewUrl() {
+  const raw = process.env.NEXT_PUBLIC_ERP_URL ?? process.env.ERP_RETURN_URL ?? "https://leonardo-erp-control-center.vercel.app";
+  const url = new URL(raw);
+  url.pathname = "/admin/identity/new";
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
 
-  return (
-    <>
-      <PageHeader
-        title="Nuovo utente"
-        description="Crea utente: anagrafica, impresa, ruolo, lingua. L'invito Supabase va inviato dal pannello Auth dopo creazione."
-        actions={<Button asChild variant="outline"><Link href="/users">← Utenti</Link></Button>}
-      />
-      <Card className="leo-card max-w-2xl">
-        <CardContent className="p-6">
-          <NewUserForm companies={companies ?? []} roles={roles ?? []} />
-        </CardContent>
-      </Card>
-    </>
-  );
+export default function NewUserPage() {
+  redirect(erpIdentityNewUrl());
 }
