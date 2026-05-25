@@ -135,6 +135,32 @@ export function EvidenceQuickWizard({
     setNotes("");
   }
 
+  async function compressImageIfNeeded(file: File): Promise<File> {
+    if (!file.type.startsWith("image/")) return file;
+    if (file.size < 600 * 1024) return file;
+    try {
+      const bitmap = await createImageBitmap(file);
+      const maxSide = 1600;
+      const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+      const w = Math.round(bitmap.width * scale);
+      const h = Math.round(bitmap.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return file;
+      ctx.drawImage(bitmap, 0, 0, w, h);
+      const blob: Blob | null = await new Promise((res) =>
+        canvas.toBlob((b) => res(b), "image/jpeg", 0.85),
+      );
+      if (!blob || blob.size >= file.size) return file;
+      const newName = file.name.replace(/\.(heic|heif|png|webp|jpg|jpeg)$/i, "") + ".jpg";
+      return new File([blob], newName, { type: "image/jpeg", lastModified: Date.now() });
+    } catch {
+      return file;
+    }
+  }
+
   function handleFileSelected(file: File | null) {
     if (!file) return;
     if (!selectedProject) {
@@ -143,8 +169,13 @@ export function EvidenceQuickWizard({
     }
 
     startTransition(async () => {
+      const compressed = await compressImageIfNeeded(file);
+      if (compressed !== file) {
+        const kb = Math.round(compressed.size / 1024);
+        toast.message(`Foto compressa a ${kb} KB`);
+      }
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", compressed);
       fd.append("kind", meta.kind);
       fd.append("entity_type", "project");
       fd.append("entity_id", selectedProject.id);
@@ -199,7 +230,7 @@ export function EvidenceQuickWizard({
       }}
     >
       <div onClick={() => setOpen(true)}>{trigger}</div>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="w-[calc(100vw-1rem)] max-w-lg max-h-[92vh] overflow-y-auto rounded-lg p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Icon className="h-5 w-5 text-brand-cyan" /> {meta.title}
@@ -215,7 +246,7 @@ export function EvidenceQuickWizard({
                 id="ew-project"
                 value={projectId}
                 onChange={(e) => setProjectId(e.target.value)}
-                className="w-full rounded-md border border-leo-border bg-leo-card px-3 py-2 text-sm"
+                className="w-full rounded-md border border-leo-border bg-leo-card px-3 py-2.5 text-base sm:text-sm"
               >
                 {projects.length === 0 && <option value="">— nessuna commessa attiva —</option>}
                 {projects.map((p) => (
@@ -226,14 +257,14 @@ export function EvidenceQuickWizard({
               </select>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="ew-ref-type">Riferimento</Label>
                 <select
                   id="ew-ref-type"
                   value={referenceType}
                   onChange={(e) => setReferenceType(e.target.value)}
-                  className="w-full rounded-md border border-leo-border bg-leo-card px-3 py-2 text-sm"
+                  className="w-full rounded-md border border-leo-border bg-leo-card px-3 py-2.5 text-base sm:text-sm"
                 >
                   {REFERENCE_TYPES.map((r) => (
                     <option key={r.value} value={r.value}>
@@ -251,7 +282,7 @@ export function EvidenceQuickWizard({
                   onChange={(e) => setReferenceCode(e.target.value)}
                   placeholder="es. DDT 1234/2026"
                   disabled={!referenceType}
-                  className="w-full rounded-md border border-leo-border bg-leo-card px-3 py-2 text-sm disabled:opacity-50"
+                  className="w-full rounded-md border border-leo-border bg-leo-card px-3 py-2.5 text-base sm:text-sm disabled:opacity-50"
                 />
               </div>
             </div>
@@ -264,17 +295,19 @@ export function EvidenceQuickWizard({
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="es. Controllo accettazione cavi MT, vedere se etichetta CE è leggibile"
                 rows={3}
+                className="text-base sm:text-sm"
               />
               <p className="text-xs text-leo-muted">
                 Spiega cosa serve documentare: senza descrizione l&apos;evidenza resta in quarantena.
               </p>
             </div>
 
-            <DialogFooter>
-              <Button variant="ghost" onClick={() => setOpen(false)}>
+            <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+              <Button variant="ghost" className="w-full sm:w-auto" onClick={() => setOpen(false)}>
                 Annulla
               </Button>
               <Button
+                className="w-full sm:w-auto"
                 onClick={() => setStep(2)}
                 disabled={!projectId || notes.trim().length < 5}
               >

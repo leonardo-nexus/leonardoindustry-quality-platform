@@ -78,7 +78,7 @@ export async function uploadMobileEvidenceAction(formData: FormData) {
   }
 
   // live_evidence
-  const { data: ev } = await admin.from("live_evidence").insert({
+  const { data: ev, error: evErr } = await admin.from("live_evidence").insert({
     company_id, project_id,
     uploaded_by: session.person.id,
     evidence_type,
@@ -88,10 +88,15 @@ export async function uploadMobileEvidenceAction(formData: FormData) {
     uploaded_at: new Date().toISOString(),
     latitude, longitude,
     device_info,
-    source: "mobile_capture",
+    source: "mobile",
     notes: `${entity_type}:${entity_id}${notes ? ` · ${notes}` : ""}`,
-    verification_status: "in_verifica",
+    verification_status: "non_verificata",
   }).select("id").single();
+  if (evErr) {
+    await admin.storage.from("evidence").remove([path]);
+    await admin.from("file_attachment").delete().eq("id", fa.id);
+    return { error: `live_evidence: ${evErr.message}` };
+  }
 
   // OCR predisposizione (scan documento)
   if (kind === "scan_documento") {
