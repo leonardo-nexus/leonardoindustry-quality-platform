@@ -239,9 +239,9 @@ export async function uploadChecklistItemEvidenceAction(
     latitude,
     longitude,
     device_info: deviceInfo,
-    source: "mobile_capture",
+    source: "mobile",
     notes,
-    verification_status: existingDup ? "sospetta" : "in_verifica",
+    verification_status: existingDup ? "sospetta" : "non_verificata",
     suspicion_flags: flags.length ? flags : null,
   });
   if (leErr) {

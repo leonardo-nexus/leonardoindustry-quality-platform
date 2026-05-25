@@ -108,9 +108,9 @@ export async function uploadReceptionPhotoAction(
     file_id: fa?.id, file_sha256: sha256,
     captured_at: new Date().toISOString(),
     uploaded_at: new Date().toISOString(),
-    source: "mobile_capture",
+    source: "mobile",
     notes: `Ricezione ${receptionId} · ${photoType}`,
-    verification_status: "in_verifica",
+    verification_status: "non_verificata",
   }).select("id").single();
 
   // Aggiorna campo specifico
