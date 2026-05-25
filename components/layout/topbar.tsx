@@ -1,4 +1,4 @@
-import { LogOut, User, HelpCircle } from "lucide-react";
+import { ArrowLeftRight, HelpCircle, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,13 @@ export function Topbar({
   companyLogoUrl?: string | null;
   roleCode: AppRole | null;
 }) {
+  const erpBaseUrl = (
+    process.env.NEXT_PUBLIC_ERP_URL ??
+    process.env.ERP_RETURN_URL ??
+    "https://leonardo-erp-control-center.vercel.app"
+  ).replace(/\/$/, "");
+  const erpDashboardUrl = `${erpBaseUrl}/dashboard`;
+
   async function handleSignOut() {
     "use server";
     await signOutAction();
@@ -51,6 +58,13 @@ export function Topbar({
         )}
       </div>
       <div className="flex items-center gap-2">
+        <Button asChild variant="outline" size="sm" className="border-brand-cyan/40 bg-brand-cyan/10 text-brand-cyan hover:bg-brand-cyan/20">
+          <a href={erpDashboardUrl}>
+            <ArrowLeftRight className="h-4 w-4" />
+            <span className="hidden sm:inline">Torna a ERP</span>
+            <span className="sm:hidden">ERP</span>
+          </a>
+        </Button>
         <LanguageSwitcher />
         <Button asChild variant="ghost" size="sm" className="px-2 text-leo-muted hover:text-brand-cyan" aria-label="Guida operativa">
           <Link href="/help"><HelpCircle className="h-4 w-4" /></Link>
