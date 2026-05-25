@@ -119,22 +119,24 @@ export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
 
   return (
     <Dialog open={!!current} onOpenChange={(o) => !o && dismissCurrent()}>
-      <DialogContent className={`max-w-md border-2 ${meta.border} bg-leo-card ${current.kind === "loss_prevention" || current.kind === "block" ? "alert-critical-pulse" : ""}`}>
+      <DialogContent
+        className={`w-[calc(100vw-2rem)] sm:w-full sm:max-w-md max-h-[85vh] overflow-y-auto border-2 ${meta.border} bg-leo-card p-4 sm:p-6 ${current.kind === "loss_prevention" || current.kind === "block" ? "alert-critical-pulse" : ""}`}
+      >
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <Icon className={`h-6 w-6 ${meta.color}`} />
+          <div className="flex items-center gap-2 flex-wrap">
+            <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${meta.color} shrink-0`} />
             <Badge variant="red" className="text-[10px]">{meta.label}</Badge>
             {remaining > 1 && (
               <span className="ml-auto text-xs text-leo-muted">{t("popup.remaining", { count: remaining })}</span>
             )}
           </div>
-          <DialogTitle className="mt-3 text-base">{current.title}</DialogTitle>
+          <DialogTitle className="mt-3 text-sm sm:text-base break-words">{current.title}</DialogTitle>
           {current.description && (
-            <DialogDescription className="whitespace-pre-line text-sm">
+            <DialogDescription className="whitespace-pre-line text-xs sm:text-sm break-words">
               {current.description}
             </DialogDescription>
           )}
-          <div className="mt-2 text-xs text-leo-muted">
+          <div className="mt-2 text-[11px] sm:text-xs text-leo-muted break-words">
             {current.company_name && <span>{current.company_name}</span>}
             {current.project_code && <span> · {current.project_code}</span>}
             <span> · da {new Date(current.opened_at).toLocaleDateString("it-IT")}</span>
@@ -149,23 +151,26 @@ export function QualityPopupManager({ items }: { items: QualityPopupItem[] }) {
           <div className="space-y-2 border-t border-leo-border pt-3">
             <label className="block text-xs text-leo-muted">{t("popup.reason_to_dismiss")}</label>
             <Textarea rows={2} value={dismissReason} onChange={(e) => setDismissReason(e.target.value)} />
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(false)} disabled={isSubmitting}>{t("actions.cancel")}</Button>
               <Button size="sm" variant="destructive" onClick={submitDismiss} disabled={isSubmitting}>{t("popup.confirm_dismiss")}</Button>
             </div>
           </div>
         ) : (
-          <DialogFooter className="flex-row justify-end gap-2 sm:gap-2">
-            <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(4)} disabled={isSubmitting}>
-              <Clock className="mr-1 h-3 w-3" /> {t("popup.snooze_4h")}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(24)} disabled={isSubmitting}>
-              <Clock className="mr-1 h-3 w-3" /> {t("popup.snooze_24h")}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(true)} disabled={isSubmitting} className="text-status-red">
-              <X className="mr-1 h-3 w-3" /> {t("actions.dismiss_with_reason")}
-            </Button>
-            <Button asChild size="sm">
+          /* Footer: wrap su mobile, 2 righe naturali; CTA principale full-width su mobile */
+          <DialogFooter className="!flex !flex-col gap-2 sm:!flex-row sm:flex-wrap sm:justify-end">
+            <div className="flex flex-wrap gap-2 order-2 sm:order-1">
+              <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(4)} disabled={isSubmitting} className="h-8 px-2">
+                <Clock className="mr-1 h-3 w-3" /> {t("popup.snooze_4h")}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => snoozeCurrent(24)} disabled={isSubmitting} className="h-8 px-2">
+                <Clock className="mr-1 h-3 w-3" /> {t("popup.snooze_24h")}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowDismissForm(true)} disabled={isSubmitting} className="h-8 px-2 text-status-red">
+                <X className="mr-1 h-3 w-3" /> {t("actions.dismiss_with_reason")}
+              </Button>
+            </div>
+            <Button asChild size="sm" className="order-1 sm:order-2 w-full sm:w-auto">
               <Link href={current.action_url} onClick={() => snoozeCurrent(1)}>
                 {t("actions.go_to_resolve")} →
               </Link>
