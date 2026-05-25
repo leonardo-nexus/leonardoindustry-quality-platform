@@ -23,6 +23,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
+import {
+  EvidenceQuickWizard,
+  type EvidenceMode,
+  type EvidenceProject,
+} from "@/components/evidence/evidence-quick-wizard";
 
 type BadgeTone = "green" | "yellow" | "red" | "gray" | "outline";
 
@@ -119,6 +124,14 @@ export default async function EvidenceIndex() {
       .order("created_at", { ascending: false })
       .limit(12),
   ]);
+
+  const { data: activeProjects } = await supabase
+    .from("project")
+    .select("id, code, name, company_id")
+    .eq("active", true)
+    .order("code")
+    .limit(200);
+  const projects = (activeProjects ?? []) as EvidenceProject[];
   const evidenceRows = (evidences ?? []) as unknown as EvidenceRow[];
   const eventRows = (recentEvents ?? []) as QualityEventRow[];
 
@@ -151,15 +164,15 @@ export default async function EvidenceIndex() {
 
       <Card className="leo-card sticky top-0 z-20 mb-6 border-brand-cyan/40 bg-leo-sidebar/95">
         <CardContent className="grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-5">
-          <Action href="/my-work" icon={Camera} label="Nuova foto" />
-          <Action href="/ocr" icon={ScanLine} label="Scannerizza documento" />
+          <WizardAction mode="photo" projects={projects} icon={Camera} label="Nuova foto" />
+          <WizardAction mode="scan" projects={projects} icon={ScanLine} label="Scannerizza documento" />
           <Action href="/materials/receptions" icon={PackageCheck} label="Ricezione materiale" />
           <Action href="/non-conformities/new" icon={AlertOctagon} label="Apri NC rapida" danger />
           <Action href="/quality-sentinel/checklists" icon={CheckSquare} label="Compila checklist" />
           <Action href="/materials" icon={Barcode} label="QR / barcode" />
-          <Action href="/my-work" icon={Mic} label="Nota vocale" />
-          <Action href="/documents/new" icon={FileUp} label="Carica documento" />
-          <Action href="/ocr" icon={UploadCloud} label="Invia OCR" />
+          <WizardAction mode="audio" projects={projects} icon={Mic} label="Nota vocale" />
+          <WizardAction mode="file" projects={projects} icon={FileUp} label="Carica documento" />
+          <WizardAction mode="scan" projects={projects} icon={UploadCloud} label="Invia OCR" />
           <Action href="/evidence?status=in_verifica" icon={Link2} label="Collega evidenza" />
         </CardContent>
       </Card>
@@ -253,6 +266,35 @@ function Action({ href, icon: Icon, label, danger = false }: { href: string; ico
         <span className="truncate">{label}</span>
       </Link>
     </Button>
+  );
+}
+
+function WizardAction({
+  mode,
+  projects,
+  icon: Icon,
+  label,
+}: {
+  mode: EvidenceMode;
+  projects: EvidenceProject[];
+  icon: LucideIcon;
+  label: string;
+}) {
+  return (
+    <EvidenceQuickWizard
+      mode={mode}
+      projects={projects}
+      trigger={
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-[44px] w-full border-brand-cyan/30 text-brand-cyan hover:bg-brand-cyan/10"
+        >
+          <Icon className="h-4 w-4" />
+          <span className="truncate">{label}</span>
+        </Button>
+      }
+    />
   );
 }
 
