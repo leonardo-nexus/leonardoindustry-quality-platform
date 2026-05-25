@@ -21,6 +21,11 @@ export async function GET(_req: NextRequest) {
     admin.from("sync_log").select("created_at").eq("direction", "outbound").order("created_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
+  // Diagnostica DB target (solo project ref, niente segreti)
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const dbRefMatch = url.match(/https?:\/\/([a-z0-9]+)\.supabase\.co/);
+  const dbRef = dbRefMatch ? dbRefMatch[1] : "(unknown)";
+
   return NextResponse.json({
     status: "ok",
     outbox: { pending: pending ?? 0, failed: failed ?? 0 },
@@ -29,6 +34,9 @@ export async function GET(_req: NextRequest) {
     last_outbound_at: lastOutbound?.created_at ?? null,
     integration_secret_configured: !!process.env.QUALITY_INTEGRATION_SECRET,
     erp_url_configured: !!process.env.ERP_INTEGRATION_URL,
+    db_ref: dbRef,
+    deploy_url: process.env.VERCEL_URL ?? "(local)",
+    deploy_commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "(unknown)",
   });
 }
 
