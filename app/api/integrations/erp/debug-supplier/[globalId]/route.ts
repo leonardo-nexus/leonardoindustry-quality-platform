@@ -41,10 +41,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ glob
     .eq("global_id", globalId)
     .maybeSingle();
 
-  // 4) Schema table (column names)
-  const { data: schemaInfo } = await admin
-    .rpc("pg_typeof_first" as any, {})
-    .catch(() => ({ data: null }));
+  // 4) Check anche per erp_supplier_id e integration_mapping per scoprire query fallback
+  const { data: byErpId } = await admin
+    .from("supplier_qualification")
+    .select("id, global_id, erp_supplier_id, score, blocked_for_orders, qualification_status, updated_at")
+    .eq("erp_supplier_id", "a3d268e3-cd65-47be-bc6f-475d585f7045");
+  const { data: mapping } = await admin
+    .from("integration_mapping")
+    .select("*")
+    .or(`global_id.eq.${globalId},erp_id.eq.a3d268e3-cd65-47be-bc6f-475d585f7045`)
+    .limit(10);
 
   return NextResponse.json({
     diagnostic: {
@@ -65,10 +71,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ glob
       total_records_for_global_id: totalCount ?? 0,
       count_error: countErr?.message ?? null,
     },
-    all_records_ordered: rows ?? [],
+    all_records_by_global_id_ordered: rows ?? [],
     all_records_error: rowsErr?.message ?? null,
     maybe_single_result: maybeSingleResult,
     maybe_single_error: maybeSingleErr?.message ?? null,
+    records_by_erp_supplier_id: byErpId ?? [],
+    integration_mapping: mapping ?? [],
     notes: [
       "Se total_records_for_global_id > 1 → duplicati: maybeSingle può ritornare il vecchio",
       "Se total_records_for_global_id = 1 ma maybeSingle ha valori diversi da all_records_ordered[0] → bug Supabase client",
